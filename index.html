@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ID History — Designers & Studios Reference</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: system-ui, sans-serif; background: #f8f7f4; color: #1a1a1a; font-size: 15px; line-height: 1.5; }
+  header { background: #1a1a1a; color: #fff; padding: 2rem 2.5rem; }
+  header h1 { font-size: 1.6rem; font-weight: 600; letter-spacing: -0.02em; margin-bottom: 0.25rem; }
+  header p { font-size: 0.9rem; color: #aaa; }
+  .controls { display: flex; flex-wrap: wrap; gap: 0.75rem; padding: 1.25rem 2rem; background: #fff; border-bottom: 1px solid #e5e5e0; position: sticky; top: 0; z-index: 10; }
+  .controls input { flex: 1; min-width: 200px; padding: 0.5rem 0.75rem; border: 1px solid #d0d0c8; border-radius: 6px; font-size: 0.9rem; background: #fafaf8; }
+  .filter-group { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+  .filter-btn { padding: 0.3rem 0.75rem; border-radius: 20px; border: 1px solid #d0d0c8; background: #fff; font-size: 0.78rem; cursor: pointer; transition: all 0.15s; white-space: nowrap; }
+  .filter-btn:hover { background: #f0ede8; }
+  .filter-btn.active { background: #1a1a1a; color: #fff; border-color: #1a1a1a; }
+  .count { padding: 1rem 2rem 0.5rem; font-size: 0.82rem; color: #666; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1rem; padding: 0.75rem 2rem 2rem; }
+  .card { background: #fff; border: 1px solid #e5e5e0; border-radius: 10px; padding: 1.1rem 1.25rem; transition: box-shadow 0.15s, transform 0.15s; text-decoration: none; color: inherit; display: block; cursor: default; }
+  .card.has-page { cursor: pointer; }
+  .card.has-page:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.1); transform: translateY(-2px); }
+  .card-unbuilt { font-size: 0.65rem; color: #bbb; margin-top: 0.5rem; letter-spacing: 0.04em; }
+  .card-type { font-size: 0.7rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: #888; margin-bottom: 0.3rem; }
+  .card-type.designer { color: #4a5fa8; }
+  .card-type.company { color: #7a4aa8; }
+  .card-type.studio { color: #4aa87a; }
+  .card-name { font-size: 1.05rem; font-weight: 600; color: #1a1a1a; margin-bottom: 0.2rem; }
+  .card-dates { font-size: 0.82rem; color: #888; margin-bottom: 0.6rem; font-style: italic; }
+  .tags { display: flex; flex-wrap: wrap; gap: 0.35rem; }
+  .tag { font-size: 0.72rem; padding: 0.2rem 0.55rem; border-radius: 12px; border: 1px solid; white-space: nowrap; }
+  .tag.era { background: #eef0f8; border-color: #c5cce8; color: #3a4a90; }
+  .tag.type { background: #f0f8f0; border-color: #b8dab8; color: #2a6a2a; }
+  .tag.style { background: #faf4f0; border-color: #e8ccc0; color: #8a4020; }
+  .tag.collab { background: #fdf4ff; border-color: #ddb8e8; color: #6a2080; }
+  @media (max-width: 600px) { .grid { grid-template-columns: 1fr; padding: 0.75rem 1rem 2rem; } header { padding: 1.5rem 1rem; } .controls { padding: 1rem; } }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Industrial Design History — Reference Index</h1>
+  <p>Designers, companies, and studios from your lecture notes · Weeks 1–12</p>
+</header>
+
+<div class="controls">
+  <input type="text" id="search" placeholder="Search names, dates, tags, companies…" oninput="onSearch()">
+  <div class="filter-group" id="type-filters">
+    <button class="filter-btn active" onclick="setTypeFilter('all',this)">All</button>
+    <button class="filter-btn" onclick="setTypeFilter('designer',this)">Designers</button>
+    <button class="filter-btn" onclick="setTypeFilter('company',this)">Companies</button>
+    <button class="filter-btn" onclick="setTypeFilter('studio',this)">Studios / Orgs</button>
+    <button class="filter-btn" onclick="setTagFilter(this)">Favorite</button>
+  </div>
+  <div class="filter-group" id="era-filters">
+    <button class="filter-btn active" onclick="setEraFilter('all',this)">All Eras</button>
+    <button class="filter-btn" onclick="setEraFilter('Ancient / Pre-Industrial',this)">Pre-Industrial</button>
+    <button class="filter-btn" onclick="setEraFilter('Arts & Crafts',this)">Arts & Crafts</button>
+    <button class="filter-btn" onclick="setEraFilter('Art Nouveau',this)">Art Nouveau</button>
+    <button class="filter-btn" onclick="setEraFilter('Art Deco',this)">Art Deco</button>
+    <button class="filter-btn" onclick="setEraFilter('Bauhaus',this)">Bauhaus</button>
+    <button class="filter-btn" onclick="setEraFilter('Mid-Century Modern',this)">Mid-Century</button>
+    <button class="filter-btn" onclick="setEraFilter('Postmodern / Memphis',this)">Postmodern</button>
+  </div>
+</div>
+
+<div class="count" id="count"></div>
+<div class="grid" id="grid"></div>
+
+<script>
+const data = [
+  { name: "Archimedes", page: "designers/archimedes.html", type: "designer", dates: "287–212 BC", tags: ["era:Ancient / Pre-Industrial","type:Engineering","type:Invention"] },
+  { name: "Pierre Jaquet-Droz", page: "designers/pierre-jaquet-droz.html", type: "designer", dates: "1721–1790", tags: ["era:Ancient / Pre-Industrial","type:Clockwork","type:Automata"] },
+  { name: "André-Charles Boulle", page: "designers/andré-charles-boulle.html", type: "designer", dates: "c. 1642–1732", tags: ["era:Ancient / Pre-Industrial","style:Royal Patronage","type:Furniture","type:Cabinetry","collab:French Royal Court"] },
+  { name: "Charles Le Brun", page: "designers/charles-le-brun.html", type: "designer", dates: "1619–1690", tags: ["era:Ancient / Pre-Industrial","style:Royal Patronage","type:Tapestry","type:Interior Design","collab:Gobelins Manufactory"] },
+  { name: "Peter Archambo", page: "designers/peter-archambo.html", type: "designer", dates: "c. 1700s", tags: ["era:Ancient / Pre-Industrial","style:Royal Patronage","type:Silversmithing","type:Homegoods"] },
+  { name: "Gabriel Sleath", page: "designers/gabriel-sleath.html", type: "designer", dates: "fl. 1700s", tags: ["era:Ancient / Pre-Industrial","style:Royal Patronage","type:Silversmithing"] },
+  { name: "Ary van Rijsselberg", page: "designers/ary-van-rijsselberg.html", type: "designer", dates: "c. 1725", tags: ["era:Ancient / Pre-Industrial","style:Royal Patronage","type:Ceramics","type:Porcelain"] },
+  { name: "Eli Terry", page: "designers/eli-terry.html", type: "designer", dates: "1772–1852", tags: ["era:American Industrial","type:Clockwork","type:Manufacturing"] },
+  { name: "John Hall", page: "designers/john-hall.html", type: "designer", dates: "1781–1841", tags: ["era:American Industrial","type:Weapons","type:Standardized Manufacturing"] },
+  { name: "Eli Whitney", page: "designers/eli-whitney.html", type: "designer", dates: "1765–1825", tags: ["era:American Industrial","type:Manufacturing","type:Weapons"] },
+  { name: "Chauncey Jerome", page: "designers/chauncey-jerome.html", type: "designer", dates: "1793–1868", tags: ["era:American Industrial","type:Clockwork"] },
+  { name: "Joseph Whitworth", page: "designers/joseph-whitworth.html", type: "designer", dates: "1803–1887", tags: ["era:American Industrial","type:Engineering","type:Precision Tools"] },
+  { name: "The Shakers", page: "designers/the-shakers.html", type: "studio", dates: "c. 1774–1900s", tags: ["era:American Industrial","style:Utilitarian","type:Furniture","type:Packaging","type:Architecture","type:Tools"] },
+  { name: "Josiah Wedgwood", page: "designers/josiah-wedgwood.html", type: "designer", dates: "1730–1795", tags: ["era:Industrial Revolution","style:Neoclassical","type:Ceramics","type:Pottery","type:Homegoods","collab:Wedgwood & Whieldon","collab:Wedgwood"] },
+  { name: "Wedgwood & Whieldon", page: "companies/wedgwood-whieldon.html", type: "company", dates: "c. 1754–1759", tags: ["era:Industrial Revolution","type:Ceramics","type:Pottery"] },
+  { name: "Wedgwood", page: "companies/wedgwood.html", type: "company", dates: "1759–present", tags: ["era:Industrial Revolution","style:Neoclassical","type:Ceramics","type:Pottery","type:Homegoods"] },
+  { name: "Singer", page: "companies/singer.html", type: "company", dates: "est. 1851", tags: ["era:Industrial Revolution","type:Manufacturing","type:Appliances"] },
+  { name: "Michael Thonet", page: "designers/michael-thonet.html", type: "designer", dates: "1796–1871", tags: ["era:Industrial Revolution","type:Furniture","type:Bentwood","type:Chairs","collab:Thonet Brothers"] },
+  { name: "Christopher Sholes", page: "designers/christopher-sholes.html", type: "designer", dates: "1819–1890", tags: ["era:Gilded Age","type:Communication Devices","type:Typewriters","collab:Remington"] },
+  { name: "Thomas Edison", page: "designers/thomas-edison.html", type: "designer", dates: "1847–1931", tags: ["era:Gilded Age","type:Lighting","type:Consumer Electronics","type:Invention","collab:Edison Electric Light Co."] },
+  { name: "Alexander Graham Bell", page: "designers/alexander-graham-bell.html", type: "designer", dates: "1847–1922", tags: ["era:Gilded Age","type:Communication Devices","type:Invention","collab:Bell Telephone Co."] },
+  { name: "George Eastman", page: "designers/george-eastman.html", type: "designer", dates: "1854–1932", tags: ["era:Gilded Age","type:Photography","type:Consumer Products","collab:Kodak"] },
+  { name: "Kodak", page: "companies/kodak.html", type: "company", dates: "est. 1892", tags: ["era:Gilded Age","type:Photography","type:Consumer Products"] },
+  { name: "Nikolaus Otto", page: "designers/nikolaus-otto.html", type: "designer", dates: "1832–1891", tags: ["era:Industrial Revolution","type:Engineering","type:Automotive","collab:Deutz AG"] },
+  { name: "Gottlieb Daimler", page: "designers/gottlieb-daimler.html", type: "designer", dates: "1834–1900", tags: ["era:Industrial Revolution","type:Automotive","type:Engineering","collab:Daimler Motoren Gesellschaft"] },
+  { name: "Karl Benz", page: "designers/karl-benz.html", type: "designer", dates: "1844–1929", tags: ["era:Industrial Revolution","type:Automotive","collab:Benz & Cie."] },
+  { name: "Edward C. Moore", page: "designers/edward-c-moore.html", type: "designer", dates: "1827–1891", tags: ["era:Gilded Age","style:Art Nouveau","type:Silversmithing","type:Jewelry","collab:Tiffany & Co."] },
+  { name: "John Ruskin", page: "designers/john-ruskin.html", type: "designer", dates: "1819–1900", tags: ["era:Arts & Crafts","style:Arts & Crafts","type:Critic / Theorist"] },
+  { name: "William Morris", page: "designers/william-morris.html", type: "designer", dates: "1834–1896", tags: ["era:Arts & Crafts","style:Arts & Crafts","type:Furniture","type:Textiles","type:Wallpaper","type:Pattern Design","collab:Morris & Co.","collab:Morris, Marshall, Faulkner & Co."] },
+  { name: "A.W. Pugin", page: "designers/aw-pugin.html", type: "designer", dates: "1812–1852", tags: ["era:Arts & Crafts","style:Gothic Revival","type:Architecture","type:Furniture"] },
+  { name: "Morris & Co.", page: "designers/morris-co.html", type: "studio", dates: "1861–1940", tags: ["era:Arts & Crafts","style:Arts & Crafts","type:Furniture","type:Textiles","type:Interior Design"] },
+  { name: "Philip Webb", page: "designers/philip-webb.html", type: "designer", dates: "1831–1915", tags: ["era:Arts & Crafts","style:Arts & Crafts","type:Architecture","type:Furniture","collab:Morris & Co.","collab:Morris, Marshall, Faulkner & Co."] },
+  { name: "John Pollard Seddon", page: "designers/john-pollard-seddon.html", type: "designer", dates: "1827–1906", tags: ["era:Arts & Crafts","style:Arts & Crafts","type:Furniture","type:Architecture","collab:Morris, Marshall, Faulkner & Co."] },
+  { name: "Ford Madox Brown", page: "designers/ford-madox-brown.html", type: "designer", dates: "1821–1893", tags: ["era:Arts & Crafts","style:Pre-Raphaelite","type:Furniture","type:Painting","collab:Morris, Marshall, Faulkner & Co."] },
+  { name: "E.W. Pugin", page: "designers/ew-pugin.html", type: "designer", dates: "1834–1875", tags: ["era:Arts & Crafts","style:Gothic Revival","type:Furniture","type:Architecture"] },
+  { name: "C.R. Ashbee", page: "designers/cr-ashbee.html", type: "designer", dates: "1863–1942", tags: ["era:Arts & Crafts","style:Arts & Crafts","type:Silversmithing","type:Jewelry","collab:Guild and School of Handicraft"] },
+  { name: "Charles Locke Eastlake", page: "designers/charles-locke-eastlake.html", type: "designer", dates: "1836–1906", tags: ["era:Arts & Crafts","style:Eastlake Style","type:Furniture","type:Upholstery"] },
+  { name: "Gustav Stickley", page: "designers/gustav-stickley.html", type: "designer", dates: "1858–1942", tags: ["era:Arts & Crafts","style:American Arts & Crafts","type:Furniture","collab:Craftsman Workshops"] },
+  { name: "Elbert Hubbard / Roycroft", page: "designers/elbert-hubbard-roycroft.html", type: "studio", dates: "1895–1915", tags: ["era:Arts & Crafts","style:American Arts & Crafts","type:Furniture","type:Publishing"] },
+  { name: "Century Guild", page: "designers/century-guild.html", type: "studio", dates: "1882–1888", tags: ["era:Arts & Crafts","style:Arts & Crafts","type:Interior Design","type:Crafts"] },
+  { name: "Art Workers Guild", page: "designers/art-workers-guild.html", type: "studio", dates: "est. 1884", tags: ["era:Arts & Crafts","style:Arts & Crafts","type:Crafts"] },
+  { name: "Guild and School of Handicraft", page: "designers/guild-and-school-of-handicraft.html", type: "studio", dates: "est. 1888", tags: ["era:Arts & Crafts","style:Arts & Crafts","type:Crafts","type:Metalwork"] },
+  { name: "Arts & Crafts Exhibition Society", page: "designers/arts-crafts-exhibition-society.html", type: "studio", dates: "est. 1887", tags: ["era:Arts & Crafts","style:Arts & Crafts","type:Exhibition"] },
+  { name: "Charles Rennie Mackintosh", page: "designers/charles-rennie-mackintosh.html", type: "designer", dates: "1868–1928", tags: ["era:Arts & Crafts","style:Glasgow Style","style:Art Nouveau","type:Furniture","type:Architecture","type:Interior Design","collab:Glasgow Four"] },
+  { name: "Margaret Macdonald Mackintosh", page: "designers/margaret-macdonald-mackintosh.html", type: "designer", dates: "1864–1933", tags: ["era:Arts & Crafts","style:Glasgow Style","style:Art Nouveau","type:Interior Design","type:Textiles","collab:Glasgow Four"] },
+  { name: "Josef Hoffmann", page: "designers/josef-hoffmann.html", type: "designer", dates: "1870–1956", tags: ["era:Arts & Crafts","style:Wiener Werkstätte","style:Secession","type:Furniture","type:Silversmithing","type:Homegoods","collab:Wiener Werkstätte"] },
+  { name: "Koloman Moser", page: "designers/koloman-moser.html", type: "designer", dates: "1868–1918", tags: ["era:Arts & Crafts","style:Wiener Werkstätte","style:Secession","type:Furniture","type:Graphic Design","type:Homegoods","collab:Wiener Werkstätte"] },
+  { name: "Wiener Werkstätte", page: "designers/wiener-werkstätte.html", type: "studio", dates: "1903–1932", tags: ["era:Arts & Crafts","style:Secession","style:Wiener Werkstätte","type:Furniture","type:Silversmithing","type:Homegoods","type:Textiles"] },
+  { name: "Christopher Dresser", page: "designers/christopher-dresser.html", type: "designer", dates: "1834–1904", tags: ["era:Industrial Revolution","era:Arts & Crafts","style:Japonisme","type:Metalwork","type:Ceramics","type:Glass","type:Pattern Design","type:Homegoods", "type:Favorite","collab:James Dixon & Sons","collab:Linthorpe Art Pottery","collab:Coalbrookdale","collab:Benham & Froud","collab:Hukin & Heath","collab:Richard Perry Son & Co","collab:Tiffany & Co."] },
+  { name: "James Dixon & Sons", page: "companies/james-dixon-sons.html", type: "company", dates: "est. 1806", tags: ["era:Industrial Revolution","type:Metalwork","type:Silversmithing"] },
+  { name: "Linthorpe Art Pottery", page: "companies/linthorpe-art-pottery.html", type: "company", dates: "1879–1889", tags: ["era:Arts & Crafts","style:Japonisme","type:Ceramics","type:Pottery"] },
+  { name: "Coalbrookdale", page: "companies/coalbrookdale.html", type: "company", dates: "c. 1870s", tags: ["era:Industrial Revolution","type:Cast Iron","type:Furniture"] },
+  { name: "Benham & Froud", page: "companies/benham-froud.html", type: "company", dates: "c. 1880s", tags: ["era:Industrial Revolution","type:Metalwork","type:Homegoods"] },
+  { name: "Alphonse Mucha", page: "designers/alphonse-mucha.html", type: "designer", dates: "1860–1939", tags: ["era:Art Nouveau","style:Art Nouveau","type:Graphic Design","type:Poster Art","type:Illustration"] },
+  { name: "Victor Horta", page: "designers/victor-horta.html", type: "designer", dates: "1861–1947", tags: ["era:Art Nouveau","style:Art Nouveau","type:Architecture","type:Interior Design","collab:Maison Horta","collab:Tassel House"] },
+  { name: "René Lalique", page: "designers/rené-lalique.html", type: "designer", dates: "1860–1945", tags: ["era:Art Nouveau","style:Art Nouveau","type:Glass","type:Jewelry","collab:Lalique"] },
+  { name: "Gustave Serrurier-Bovy", page: "designers/gustave-serrurier-bovy.html", type: "designer", dates: "1858–1910", tags: ["era:Art Nouveau","style:Art Nouveau","type:Furniture"] },
+  { name: "William H. Bradley", page: "designers/william-h-bradley.html", type: "designer", dates: "1868–1962", tags: ["era:Art Nouveau","style:Art Nouveau","type:Graphic Design","type:Poster Art"] },
+  { name: "Frank Hazenplug", page: "designers/frank-hazenplug.html", type: "designer", dates: "1873–1931", tags: ["era:Art Nouveau","style:Art Nouveau","type:Graphic Design","type:Illustration"] },
+  { name: "Cornelius L.J. Rogers", page: "designers/cornelius-lj-rogers.html", type: "designer", dates: "fl. 1890s", tags: ["era:Art Nouveau","style:Art Nouveau","type:Furniture"] },
+  { name: "Arthur Silver / Silver Studio Design", page: "designers/arthur-silver-silver-studio-design.html", type: "studio", dates: "est. 1880", tags: ["era:Art Nouveau","style:Art Nouveau","type:Textiles","type:Pattern Design"] },
+  { name: "Mariano Fortuny", page: "designers/mariano-fortuny.html", type: "designer", dates: "1871–1949", tags: ["era:Art Nouveau","style:Art Nouveau","type:Textiles","type:Lighting","type:Fashion","collab:Fortuny Studio Venice"] },
+  { name: "Otto Wagner", page: "designers/otto-wagner.html", type: "designer", dates: "1841–1918", tags: ["era:Art Nouveau","style:Secession","type:Architecture","collab:Wiener Stadtbahn"] },
+  { name: "Emile Gallé", page: "designers/emile-gallé.html", type: "designer", dates: "1846–1904", tags: ["era:Art Nouveau","style:Art Nouveau","type:Glass","type:Ceramics","type:Furniture","collab:Gallé Studio Nancy"] },
+  { name: "Daum Frères", page: "designers/daum-frères.html", type: "studio", dates: "est. 1878", tags: ["era:Art Nouveau","style:Art Nouveau","type:Glass"] },
+  { name: "Sigfried Bing", page: "designers/sigfried-bing.html", type: "designer", dates: "1838–1905", tags: ["era:Art Nouveau","style:Japonisme","style:Art Nouveau","type:Gallery / Curator","collab:Maison de l'Art Nouveau"] },
+  { name: "Henry Van de Velde", page: "designers/henry-van-de-velde.html", type: "designer", dates: "1863–1957", tags: ["era:Art Nouveau","era:Bauhaus","style:Art Nouveau","type:Furniture","type:Architecture","type:Graphic Design","collab:Weimar School of Arts & Crafts","collab:Deutscher Werkbund"] },
+  { name: "Wilhelm Lucas von Cranach", page: "designers/wilhelm-lucas-von-cranach.html", type: "designer", dates: "1861–1918", tags: ["era:Art Nouveau","style:Art Nouveau","type:Jewelry"] },
+  { name: "Philippe Wolfers", page: "designers/philippe-wolfers.html", type: "designer", dates: "1858–1929", tags: ["era:Art Nouveau","style:Art Nouveau","type:Jewelry","type:Silversmithing"] },
+  { name: "William C. Codman", page: "designers/william-c-codman.html", type: "designer", dates: "1839–1921", tags: ["era:Art Nouveau","style:Art Nouveau","type:Silversmithing","type:Homegoods","collab:Gorham Co."] },
+  { name: "Gorham Co.", page: "companies/gorham-co.html", type: "company", dates: "est. 1831", tags: ["era:Art Nouveau","era:Gilded Age","type:Silversmithing","type:Homegoods"] },
+  { name: "Hector Guimard", page: "designers/hector-guimard.html", type: "designer", dates: "1867–1942", tags: ["era:Art Nouveau","style:Art Nouveau","type:Architecture","type:Furniture","type:Interior Design","collab:Paris Métro"] },
+  { name: "Ernst Haeckel", page: "designers/ernst-haeckel.html", type: "designer", dates: "1834–1919", tags: ["era:Art Nouveau","type:Scientific Illustration","type:Pattern Design"] },
+  { name: "Charles Tiffany", page: "designers/charles-tiffany.html", type: "designer", dates: "1812–1902", tags: ["era:Gilded Age","era:Art Nouveau","type:Jewelry","type:Silversmithing","collab:Tiffany & Co."] },
+  { name: "Tiffany & Co.", page: "companies/tiffany-co.html", type: "company", dates: "est. 1837", tags: ["era:Gilded Age","era:Art Nouveau","type:Jewelry","type:Silversmithing","type:Homegoods"] },
+  { name: "Paulding Farnham", page: "designers/paulding-farnham.html", type: "designer", dates: "1859–1927", tags: ["era:Art Nouveau","style:Art Nouveau","type:Jewelry","type:Silversmithing","collab:Tiffany & Co."] },
+  { name: "Louis Comfort Tiffany", page: "designers/louis-comfort-tiffany.html", type: "designer", dates: "1848–1933", tags: ["era:Art Nouveau","style:Art Nouveau","type:Glass","type:Lighting","type:Interior Design","collab:Tiffany Glass & Decorating Co.","collab:Associated Artists"] },
+  { name: "Tiffany Glass & Decorating Co.", page: "companies/tiffany-glass-decorating-co.html", type: "company", dates: "est. 1892", tags: ["era:Art Nouveau","style:Art Nouveau","type:Glass","type:Lighting"] },
+  { name: "Candace Wheeler", page: "designers/candace-wheeler.html", type: "designer", dates: "1827–1923", tags: ["era:Art Nouveau","style:Art Nouveau","type:Textiles","type:Interior Design","collab:Associated Artists","collab:Tiffany & Co."] },
+  { name: "Associated Artists", page: "designers/associated-artists.html", type: "studio", dates: "1879–1883", tags: ["era:Art Nouveau","style:Art Nouveau","type:Interior Design","type:Textiles"] },
+  { name: "Le Printemps", page: "companies/le-printemps.html", type: "company", dates: "est. 1865", tags: ["era:Art Nouveau","type:Retail / Department Store"] },
+  { name: "Galleries Lafayette", page: "companies/galleries-lafayette.html", type: "company", dates: "est. 1893", tags: ["era:Art Nouveau","type:Retail / Department Store"] },
+  { name: "Wanamakers", page: "companies/wanamakers.html", type: "company", dates: "est. 1861", tags: ["era:Art Nouveau","type:Retail / Department Store"] },
+  { name: "Peter Behrens", page: "designers/peter-behrens.html", type: "designer", dates: "1868–1940", tags: ["era:Art Nouveau","era:Modernism","style:Deutscher Werkbund","type:Industrial Design","type:Graphic Design","type:Architecture","type:Lighting","type:Appliances","collab:AEG","collab:Deutscher Werkbund"] },
+  { name: "AEG", page: "companies/aeg.html", type: "company", dates: "est. 1883", tags: ["era:Modernism","style:Deutscher Werkbund","type:Consumer Electronics","type:Appliances","type:Lighting"] },
+  { name: "Deutscher Werkbund", page: "designers/deutscher-werkbund.html", type: "studio", dates: "est. 1907", tags: ["era:Modernism","style:Deutscher Werkbund","type:Design Organization"] },
+  { name: "Émile-Jacques Ruhlmann", page: "designers/émile-jacques-ruhlmann.html", type: "designer", dates: "1879–1933", tags: ["era:Art Deco","style:Art Deco","type:Furniture","type:Interior Design","collab:Ruhlmann et Laurent"] },
+  { name: "Paul Frankl", page: "designers/paul-frankl.html", type: "designer", dates: "1886–1958", tags: ["era:Art Deco","style:Art Deco","type:Furniture","type:Interior Design","collab:Frankl Galleries"] },
+  { name: "Lajos Kozma", page: "designers/lajos-kozma.html", type: "designer", dates: "1884–1948", tags: ["era:Art Deco","style:Art Deco","type:Furniture","type:Interior Design"] },
+  { name: "Jean Goulden", page: "designers/jean-goulden.html", type: "designer", dates: "1878–1947", tags: ["era:Art Deco","style:Art Deco","type:Metalwork","type:Jewelry"] },
+  { name: "W.D. Teague / Walter Dorwin Teague", page: "designers/wd-teague-walter-dorwin-teague.html", type: "designer", dates: "1883–1960", tags: ["era:Art Deco","style:Streamlining","type:Industrial Design","type:Consumer Electronics","type:Packaging","collab:Kodak","collab:Boeing","collab:Sparton Radio","collab:Polaroid"] },
+  { name: "Norman Bel Geddes", page: "designers/norman-bel-geddes.html", type: "designer", dates: "1893–1958", tags: ["era:Art Deco","style:Streamlining","type:Industrial Design","type:Automotive","type:Furniture","type:Appliances","collab:Emerson Radio","collab:GE Magic Chef","collab:Graham-Paige Motors"] },
+  { name: "Donald Deskey", page: "designers/donald-deskey.html", type: "designer", dates: "1894–1989", tags: ["era:Art Deco","style:Art Deco","type:Furniture","type:Interior Design","type:Lighting","collab:Radio City Music Hall","collab:Ypsilanti Furniture"] },
+  { name: "Gilbert Rohde", page: "designers/gilbert-rohde.html", type: "designer", dates: "1894–1944", tags: ["era:Art Deco","era:Mid-Century Modern","style:Modernism","type:Furniture","type:Industrial Design","collab:Herman Miller","collab:Herman Miller Clock Co."] },
+  { name: "Kern Weber", page: "designers/kern-weber.html", type: "designer", dates: "1889–1963", tags: ["era:Art Deco","style:Art Deco","style:Modernism","type:Furniture","type:Clocks","collab:Airline Chair Co.","collab:Lloyd Manufacturing"] },
+  { name: "Lurelle Guild", page: "designers/lurelle-guild.html", type: "designer", dates: "1898–1985", tags: ["era:Art Deco","style:Art Deco","type:Homegoods","type:Industrial Design","collab:Wear-Ever Aluminum"] },
+  { name: "Russell Wright", page: "designers/russell-wright.html", type: "designer", dates: "1904–1976", tags: ["era:Mid-Century Modern","style:American Modern","type:Homegoods","type:Ceramics","type:Furniture","collab:Steubenville Pottery"] },
+  { name: "Luigi Dominioni & Pier Castiglioni", page: "designers/luigi-dominioni-pier-castiglioni.html", type: "designer", dates: "fl. 1940s", tags: ["era:Mid-Century Modern","type:Consumer Electronics","type:Radio"] },
+  { name: "Wells Coates", page: "designers/wells-coates.html", type: "designer", dates: "1895–1958", tags: ["era:Art Deco","style:Modernism","type:Architecture","type:Consumer Electronics","collab:Ekco"] },
+  { name: "Louis Kalff", page: "designers/louis-kalff.html", type: "designer", dates: "1897–1976", tags: ["era:Art Deco","style:Art Deco","type:Lighting","collab:Philips"] },
+  { name: "Jean Heiberg & B.C. Bjørklund", page: "designers/jean-heiberg-bc-bjørklund.html", type: "designer", dates: "fl. 1930s", tags: ["era:Art Deco","style:Modernism","type:Communication Devices","type:Telephones","collab:Ericsson"] },
+  { name: "George Luns", page: "designers/george-luns.html", type: "designer", dates: "fl. 1930s", tags: ["era:Art Deco","style:Art Deco","type:Communication Devices","collab:Western Electric"] },
+  { name: "Clarence Karlstadt", page: "designers/clarence-karlstadt.html", type: "designer", dates: "fl. 1930s", tags: ["era:Art Deco","style:Art Deco","type:Consumer Electronics","type:Radio","collab:Sears Silvertone"] },
+  { name: "Yeshwantrao Holkar II (Maharaja of Indore)", page: "designers/yeshwantrao-holkar-ii-maharaja-of-indore.html", type: "designer", dates: "1908–1961, reigned 1926–1948", tags: ["era:Art Deco","style:Art Deco","type:Interior Design","type:Patron","collab:Bouet de Monvel","collab:Eckart Muthesius"] },
+  { name: "Sanyogita Bai Devi", page: "designers/sanyogita-bai-devi.html", type: "designer", dates: "1914–1937", tags: ["era:Art Deco","style:Art Deco","type:Fashion","type:Jewelry","collab:Bouet de Monvel"] },
+  { name: "Eckart Muthesius", page: "designers/eckart-muthesius.html", type: "designer", dates: "1904–1989", tags: ["era:Art Deco","style:Art Deco","style:Bauhaus","type:Furniture","type:Interior Design","collab:Manik Bagh Palace"] },
+  { name: "Adolf Loos", page: "designers/adolf-loos.html", type: "designer", dates: "1870–1933", tags: ["era:Modernism","style:Modernism","type:Architecture","type:Furniture"] },
+  { name: "Robert Mallet-Stevens", page: "designers/robert-mallet-stevens.html", type: "designer", dates: "1886–1945", tags: ["era:Art Deco","style:Art Deco","style:Modernism","type:Architecture","type:Interior Design","collab:Manik Bagh Palace"] },
+  { name: "Man Ray", page: "designers/man-ray.html", type: "designer", dates: "1890–1976", tags: ["era:Art Deco","style:Surrealism","type:Photography","type:Jewelry"] },
+  { name: "Alfa Romeo", page: "companies/alfa-romeo.html", type: "company", dates: "est. 1910", tags: ["era:Art Deco","type:Automotive"] },
+  { name: "Hispano Suiza", page: "companies/hispano-suiza.html", type: "company", dates: "1904–1946", tags: ["era:Art Deco","type:Automotive"] },
+  { name: "Mercedes-Benz", page: "companies/mercedes-benz.html", type: "company", dates: "est. 1926", tags: ["era:Art Deco","type:Automotive"] },
+  { name: "Duesenberg", page: "companies/duesenberg.html", type: "company", dates: "1913–1937", tags: ["era:Art Deco","type:Automotive"] },
+  { name: "Bugatti", page: "companies/bugatti.html", type: "company", dates: "est. 1909", tags: ["era:Art Deco","type:Automotive"] },
+  { name: "Frank & Lillian Gilbreth", page: "designers/frank-lillian-gilbreth.html", type: "designer", dates: "1868–1924 / 1878–1972", tags: ["era:Modernism","style:Scientific Management","type:Ergonomics","type:Kitchen Design"] },
+  { name: "Catherine Frederick", page: "designers/catherine-frederick.html", type: "designer", dates: "1883–1954", tags: ["era:Modernism","style:Scientific Management","type:Kitchen Design","type:Interior Design"] },
+  { name: "Marc Harrison", page: "designers/marc-harrison.html", type: "designer", dates: "1936–1998", tags: ["era:Mid-Century Modern","style:Universal Design","type:Kitchen Design","type:Ergonomics","collab:Cuisinart"] },
+  { name: "Thomas Lamb", page: "designers/thomas-lamb.html", type: "designer", dates: "1896–1988", tags: ["era:Mid-Century Modern","style:Universal Design","type:Homegoods","type:Tools","type:Ergonomics"] },
+  { name: "Emilio Ambasz & Giancarlo Piretti", page: "designers/emilio-ambasz-giancarlo-piretti.html", type: "designer", dates: "fl. 1970s", tags: ["era:Postmodern / Memphis","style:Universal Design","type:Furniture","type:Ergonomics","collab:Castelli"] },
+  { name: "Peter Opsvik", page: "designers/peter-opsvik.html", type: "designer", dates: "b. 1939", tags: ["era:Postmodern / Memphis","style:Universal Design","type:Furniture","type:Ergonomics","collab:Stokke"] },
+  { name: "Fred Scott", page: "designers/fred-scott.html", type: "designer", dates: "fl. 1970s", tags: ["era:Postmodern / Memphis","style:Universal Design","type:Furniture","type:Ergonomics","collab:Hille"] },
+  { name: "Ergonomi Design Gruppen", page: "designers/ergonomi-design-gruppen.html", type: "studio", dates: "est. 1973", tags: ["era:Postmodern / Memphis","style:Universal Design","type:Homegoods","type:Tools","type:Ergonomics"] },
+  { name: "Eileen Gray", page: "designers/eileen-gray.html", type: "designer", dates: "1878–1976", tags: ["era:Art Deco","era:Modernism","style:Modernism","type:Furniture","type:Architecture","type:Interior Design","type:Lacquerware","collab:Aram (posthumous releases)"] },
+  { name: "Seizo Sugawara", page: "designers/seizo-sugawara.html", type: "designer", dates: "fl. 1900s", tags: ["era:Art Deco","style:Japonisme","type:Lacquerware"] },
+  { name: "Le Corbusier", page: "designers/le-corbusier.html", type: "designer", dates: "1887–1965", tags: ["era:Modernism","era:Bauhaus","style:International Style","type:Architecture","type:Furniture","type:Interior Design","collab:Cassina (posthumous)","collab:Charlotte Perriand (collaboration)"] },
+  { name: "Charlotte Perriand", page: "designers/charlotte-perriand.html", type: "designer", dates: "1903–1999", tags: ["era:Modernism","era:Bauhaus","style:International Style","type:Furniture","type:Interior Design","collab:Le Corbusier Studio","collab:Cassina"] },
+  { name: "Aram (Releases)", page: "companies/aram-releases.html", type: "company", dates: "est. 1964", tags: ["era:Mid-Century Modern","type:Furniture","type:Design Retail"] },
+  { name: "Walter Gropius", page: "designers/walter-gropius.html", type: "designer", dates: "1883–1969", tags: ["era:Bauhaus","style:Bauhaus","type:Architecture","type:Design Education","collab:Bauhaus"] },
+  { name: "Bauhaus", page: "designers/bauhaus.html", type: "studio", dates: "1919–1933", tags: ["era:Bauhaus","style:Bauhaus","type:Design School","type:Furniture","type:Lighting","type:Textiles"] },
+  { name: "Marcel Breuer", page: "designers/marcel-breuer.html", type: "designer", dates: "1902–1981", tags: ["era:Bauhaus","style:Bauhaus","style:Modernism","type:Furniture","type:Architecture","type:Chairs","collab:Bauhaus","collab:Isokon","collab:Thonet","collab:Knoll"] },
+  { name: "Marianne Brandt", page: "designers/marianne-brandt.html", type: "designer", dates: "1893–1983", tags: ["era:Bauhaus","style:Bauhaus","type:Metalwork","type:Lighting","type:Homegoods","collab:Bauhaus Metal Workshop","collab:Ruppelwerk"] },
+  { name: "Wilhelm Wagenfeld", page: "designers/wilhelm-wagenfeld.html", type: "designer", dates: "1900–1990", tags: ["era:Bauhaus","style:Bauhaus","type:Lighting","type:Homegoods","type:Glass","collab:Bauhaus","collab:WMF"] },
+  { name: "Mies van der Rohe", page: "designers/mies-van-der-rohe.html", type: "designer", dates: "1886–1969", tags: ["era:Bauhaus","style:International Style","type:Furniture","type:Architecture","type:Chairs","collab:Bauhaus","collab:Knoll"] },
+  { name: "Lilly Reich", page: "designers/lilly-reich.html", type: "designer", dates: "1885–1947", tags: ["era:Bauhaus","style:Bauhaus","type:Furniture","type:Interior Design","type:Textiles","collab:Bauhaus","collab:Mies van der Rohe Studio"] },
+  { name: "Mart Stam", page: "designers/mart-stam.html", type: "designer", dates: "1899–1986", tags: ["era:Bauhaus","style:Bauhaus","type:Furniture","type:Chairs","collab:Thonet"] },
+  { name: "Josef Albers", page: "designers/josef-albers.html", type: "designer", dates: "1888–1976", tags: ["era:Bauhaus","style:Bauhaus","type:Furniture","type:Textiles","type:Art","collab:Bauhaus","collab:Black Mountain College"] },
+  { name: "Isokon (Jack Pritchard)", page: "companies/isokon-jack-pritchard.html", type: "company", dates: "est. 1931", tags: ["era:Bauhaus","style:Modernism","type:Furniture","type:Plywood"] },
+  { name: "Hans & Wassili Luckhardt", page: "designers/hans-wassili-luckhardt.html", type: "designer", dates: "1880–1954 / 1889–1972", tags: ["era:Bauhaus","style:Expressionism","type:Furniture","type:Chairs","type:Architecture","collab:DESTA / Thonet"] },
+  { name: "Anton Lorenz", page: "designers/anton-lorenz.html", type: "designer", dates: "1891–1964", tags: ["era:Bauhaus","style:Modernism","type:Furniture","type:Chairs","collab:Thonet"] },
+  { name: "Paul Schuitema", page: "designers/paul-schuitema.html", type: "designer", dates: "1897–1973", tags: ["era:Bauhaus","style:Constructivism","type:Graphic Design"] },
+  { name: "Louis Sognot", page: "designers/louis-sognot.html", type: "designer", dates: "1892–1970", tags: ["era:Art Deco","style:Art Deco","type:Furniture"] },
+  { name: "Charlotte Alix", page: "designers/charlotte-alix.html", type: "designer", dates: "1897–1987", tags: ["era:Art Deco","style:Art Deco","type:Furniture"] },
+  { name: "Walter Knoll", page: "companies/walter-knoll.html", type: "company", dates: "est. 1865", tags: ["era:Bauhaus","era:Mid-Century Modern","type:Furniture"] },
+  { name: "DESTA / Thonet", page: "companies/desta-thonet.html", type: "company", dates: "c. 1930", tags: ["era:Bauhaus","style:Bauhaus","type:Furniture","type:Chairs"] },
+  { name: "Giuseppe Terragni", page: "designers/giuseppe-terragni.html", type: "designer", dates: "1904–1943", tags: ["era:Bauhaus","style:Italian Rationalism","type:Furniture","type:Architecture","collab:DESTA / Thonet"] },
+  { name: "Oliver Bernard", page: "designers/oliver-bernard.html", type: "designer", dates: "1881–1939", tags: ["era:Art Deco","style:Art Deco","type:Interior Design"] },
+  { name: "Paul Henningsen", page: "designers/paul-henningsen.html", type: "designer", dates: "1894–1967", tags: ["era:Bauhaus","style:Scandinavian Modern","type:Lighting","collab:Louis Poulsen"] },
+  { name: "Jean Burkhalter", page: "designers/jean-burkhalter.html", type: "designer", dates: "1895–1982", tags: ["era:Bauhaus","style:Modernism","type:Furniture"] },
+  { name: "Nathan George Horwitt", page: "designers/nathan-george-horwitt.html", type: "designer", dates: "1898–1990", tags: ["era:Modernism","style:Modernism","type:Furniture","collab:Howall Manufacturing"] },
+  { name: "Wolfgang Hoffmann", page: "designers/wolfgang-hoffmann.html", type: "designer", dates: "1900–1969", tags: ["era:Art Deco","style:Modernism","type:Furniture","collab:Howell Co."] },
+  { name: "Edmund Rumpler", page: "designers/edmund-rumpler.html", type: "designer", dates: "1872–1940", tags: ["era:Art Deco","style:Streamlining","type:Automotive","collab:Tropfenwagen"] },
+  { name: "John Tjaarda", page: "designers/john-tjaarda.html", type: "designer", dates: "1897–1962", tags: ["era:Art Deco","style:Streamlining","type:Automotive","collab:Briggs Manufacturing","collab:Lincoln Zephyr"] },
+  { name: "Ferdinand Porsche", page: "designers/ferdinand-porsche.html", type: "designer", dates: "1875–1951", tags: ["era:Art Deco","style:Streamlining","type:Automotive","collab:Volkswagen","collab:KdF-Wagen"] },
+  { name: "Walter Becchia", page: "designers/walter-becchia.html", type: "designer", dates: "1902–1990", tags: ["era:Art Deco","style:Streamlining","type:Automotive","collab:Talbot Lago"] },
+  { name: "Paul Arzens", page: "designers/paul-arzens.html", type: "designer", dates: "1903–1990", tags: ["era:Art Deco","style:Streamlining","type:Automotive","collab:La Baleine"] },
+  { name: "Paul Jaray", page: "designers/paul-jaray.html", type: "designer", dates: "1889–1974", tags: ["era:Art Deco","style:Streamlining","type:Automotive"] },
+  { name: "Carlo Castagna", page: "designers/carlo-castagna.html", type: "designer", dates: "fl. 1930s", tags: ["era:Art Deco","style:Streamlining","type:Automotive","collab:Alfa Romeo"] },
+  { name: "Aurel Persu", page: "designers/aurel-persu.html", type: "designer", dates: "1890–1977", tags: ["era:Art Deco","style:Streamlining","type:Automotive"] },
+  { name: "Buckminster Fuller", page: "designers/buckminster-fuller.html", type: "designer", dates: "1895–1983", tags: ["era:Mid-Century Modern","style:Futurism","type:Architecture","type:Invention","type:Automotive","collab:Dymaxion Car"] },
+  { name: "Raymond Loewy", page: "designers/raymond-loewy.html", type: "designer", dates: "1893–1986", tags: ["era:Art Deco","era:Mid-Century Modern","style:Streamlining","type:Industrial Design","type:Branding","type:Automotive","type:Transportation","type:Packaging","collab:Studebaker","collab:Coca-Cola","collab:Sears Roebuck","collab:Shell","collab:Exxon","collab:NASA","collab:Lucky Strike","collab:Rosenthal Ceramics","collab:Le Creuset"] },
+  { name: "Studebaker", page: "companies/studebaker.html", type: "company", dates: "est. 1852", tags: ["era:Mid-Century Modern","style:Streamlining","type:Automotive"] },
+  { name: "Coca-Cola", page: "companies/coca-cola.html", type: "company", dates: "est. 1892", tags: ["era:Mid-Century Modern","type:Branding","type:Packaging"] },
+  { name: "Sears Roebuck", page: "companies/sears-roebuck.html", type: "company", dates: "est. 1892", tags: ["era:Art Deco","era:Mid-Century Modern","type:Retail / Department Store","type:Appliances"] },
+  { name: "Henry Dreyfuss", page: "designers/henry-dreyfuss.html", type: "designer", dates: "1904–1972", tags: ["era:Mid-Century Modern","style:Human Factors","type:Industrial Design","type:Ergonomics","type:Communication Devices","type:Appliances","collab:Bell Telephone (AT&T)","collab:John Deere","collab:American Thermos","collab:Crane Co.","collab:Hoover"] },
+  { name: "Bell Telephone (AT&T)", page: "companies/bell-telephone-att.html", type: "company", dates: "est. 1877", tags: ["era:Mid-Century Modern","type:Communication Devices","type:Telephones"] },
+  { name: "John Deere", page: "companies/john-deere.html", type: "company", dates: "est. 1837", tags: ["era:Mid-Century Modern","type:Agricultural Equipment","type:Industrial Design"] },
+  { name: "Samuel Gragg", page: "designers/samuel-gragg.html", type: "designer", dates: "1772–1855", tags: ["era:American Industrial","type:Furniture","type:Chairs"] },
+  { name: "John Henry Belter", page: "designers/john-henry-belter.html", type: "designer", dates: "1804–1863", tags: ["era:American Industrial","style:Victorian","type:Furniture","type:Chairs"] },
+  { name: "Gerald Summers", page: "designers/gerald-summers.html", type: "designer", dates: "1899–1967", tags: ["era:Bauhaus","style:Modernism","type:Furniture","type:Plywood","collab:Makers of Simple Furniture"] },
+  { name: "Alvar Aalto", page: "designers/alvar-aalto.html", type: "designer", dates: "1898–1976", tags: ["era:Bauhaus","era:Mid-Century Modern","style:Scandinavian Modern","type:Furniture","type:Architecture","type:Glass","collab:Artek","collab:Isokon"] },
+  { name: "Aino Marsio-Aalto", page: "designers/aino-marsio-aalto.html", type: "designer", dates: "1894–1949", tags: ["era:Mid-Century Modern","style:Scandinavian Modern","type:Furniture","type:Glass","type:Homegoods","collab:Artek","collab:Iittala"] },
+  { name: "Gerrit Rietveld", page: "designers/gerrit-rietveld.html", type: "designer", dates: "1888–1964", tags: ["era:Bauhaus","style:De Stijl","type:Furniture","type:Architecture","type:Chairs"] },
+  { name: "Artek", page: "companies/artek.html", type: "company", dates: "est. 1935", tags: ["era:Mid-Century Modern","style:Scandinavian Modern","type:Furniture"] },
+  { name: "Arne Jacobsen", page: "designers/arne-jacobsen.html", type: "designer", dates: "1902–1971", tags: ["era:Mid-Century Modern","style:Scandinavian Modern","type:Furniture","type:Architecture","type:Chairs","collab:Fritz Hansen"] },
+  { name: "David Rowland", page: "designers/david-rowland.html", type: "designer", dates: "1924–2010", tags: ["era:Mid-Century Modern","style:Modernism","type:Furniture","type:Chairs","collab:GF Business Equipment"] },
+  { name: "Eero Saarinen", page: "designers/eero-saarinen.html", type: "designer", dates: "1910–1961", tags: ["era:Mid-Century Modern","style:Organic Modernism","type:Furniture","type:Architecture","type:Chairs","collab:Knoll"] },
+  { name: "Charles and Ray Eames", page: "designers/charles-and-ray-eames.html", type: "designer", dates: "1907–1978 / 1912–1988", tags: ["era:Mid-Century Modern","style:Organic Modernism","type:Furniture","type:Architecture","type:Film","type:Toys","type:Chairs","collab:Herman Miller","collab:Eames Office","collab:Evans Products"] },
+  { name: "Eames Office", page: "designers/eames-office.html", type: "studio", dates: "1941–1988", tags: ["era:Mid-Century Modern","style:Organic Modernism","type:Furniture","type:Film","type:Exhibition Design"] },
+  { name: "Herman Miller", page: "companies/herman-miller.html", type: "company", dates: "est. 1905", tags: ["era:Mid-Century Modern","style:Modernism","type:Furniture","type:Office Design"] },
+  { name: "Eva Zeisel", page: "designers/eva-zeisel.html", type: "designer", dates: "1906–2011", tags: ["era:Mid-Century Modern","style:Organic Modernism","type:Ceramics","type:Homegoods","collab:Castleton China","collab:Museum of Modern Art"] },
+  { name: "Russel Wright", page: "designers/russel-wright.html", type: "designer", dates: "1904–1976", tags: ["era:Mid-Century Modern","style:American Modern","type:Homegoods","type:Ceramics","type:Furniture","collab:Steubenville Pottery","collab:Bauer Pottery"] },
+  { name: "Freda Diamond", page: "designers/freda-diamond.html", type: "designer", dates: "1905–1998", tags: ["era:Mid-Century Modern","style:American Modern","type:Homegoods","type:Glass","type:Textiles","collab:Libbey Glass"] },
+  { name: "Isamu Noguchi", page: "designers/isamu-noguchi.html", type: "designer", dates: "1904–1988", tags: ["era:Mid-Century Modern","style:Organic Modernism","type:Furniture","type:Sculpture","type:Lighting","collab:Herman Miller","collab:Knoll"] },
+  { name: "Hans Knoll", page: "designers/hans-knoll.html", type: "designer", dates: "1914–1955", tags: ["era:Mid-Century Modern","style:Modernism","type:Furniture","type:Office Design","collab:Knoll"] },
+  { name: "Florence Knoll", page: "designers/florence-knoll.html", type: "designer", dates: "1917–2019", tags: ["era:Mid-Century Modern","style:Modernism","type:Furniture","type:Interior Design","type:Office Design","collab:Knoll","collab:Cranbrook Academy"] },
+  { name: "Knoll", page: "companies/knoll.html", type: "company", dates: "est. 1938", tags: ["era:Mid-Century Modern","style:Modernism","type:Furniture","type:Office Design"] },
+  { name: "Harry Bertoia", page: "designers/harry-bertoia.html", type: "designer", dates: "1915–1978", tags: ["era:Mid-Century Modern","style:Modernism","type:Furniture","type:Sculpture","type:Jewelry","collab:Knoll"] },
+  { name: "George Nelson", page: "designers/george-nelson.html", type: "designer", dates: "1908–1986", tags: ["era:Mid-Century Modern","style:Modernism","type:Furniture","type:Office Design","type:Clocks","collab:Herman Miller"] },
+  { name: "Bob Propst", page: "designers/bob-propst.html", type: "designer", dates: "1921–2000", tags: ["era:Mid-Century Modern","style:Modernism","type:Office Design","type:Furniture","collab:Herman Miller"] },
+  { name: "Eliot Noyes", page: "designers/eliot-noyes.html", type: "designer", dates: "1910–1977", tags: ["era:Mid-Century Modern","style:Modernism","type:Industrial Design","type:Consumer Electronics","collab:IBM","collab:Mobil"] },
+  { name: "Ettore Sottsass", page: "designers/ettore-sottsass.html", type: "designer", dates: "1917–2007", tags: ["era:Postmodern / Memphis","style:Memphis Group","type:Furniture","type:Consumer Electronics","type:Ceramics","collab:Olivetti","collab:Memphis Group"] },
+  { name: "Max Braun", page: "designers/max-braun.html", type: "designer", dates: "1890–1951", tags: ["era:Mid-Century Modern","style:German Modernism","type:Consumer Electronics","type:Appliances","collab:Braun"] },
+  { name: "Braun", type: "company", dates: "est. 1921", page: "companies/braun.html", tags: ["era:Mid-Century Modern","style:German Modernism","type:Consumer Electronics","type:Appliances"] },
+  { name: "Dieter Rams", type: "designer", dates: "b. 1932", page: "designers/dieter-rams.html", tags: ["era:Mid-Century Modern","style:German Modernism","style:Good Design","type:Consumer Electronics","type:Appliances","type:Industrial Design","collab:Braun","collab:Vitsoe"] },
+  { name: "Gerd Alfred Müller", page: "designers/gerd-alfred-müller.html", type: "designer", dates: "1932–1991", tags: ["era:Mid-Century Modern","style:German Modernism","type:Consumer Electronics","type:Appliances","collab:Braun"] },
+  { name: "Robert Oberheim", page: "designers/robert-oberheim.html", type: "designer", dates: "fl. 1950s–1960s", tags: ["era:Mid-Century Modern","style:German Modernism","type:Appliances","collab:Braun"] },
+  { name: "Jürgen Greubel", page: "designers/jürgen-greubel.html", type: "designer", dates: "fl. 1960s", tags: ["era:Mid-Century Modern","style:German Modernism","type:Appliances","collab:Braun"] },
+  { name: "Arthur & Erwin Braun", page: "designers/arthur-erwin-braun.html", type: "designer", dates: "fl. 1950s–1960s", tags: ["era:Mid-Century Modern","style:German Modernism","type:Consumer Electronics","type:Appliances","collab:Braun"] },
+  { name: "Otl Aicher", page: "designers/otl-aicher.html", type: "designer", dates: "1922–1991", tags: ["era:Mid-Century Modern","style:Swiss Style","type:Graphic Design","type:Typography","collab:HfG Ulm","collab:Braun","collab:Lufthansa"] },
+  { name: "Max Bill", page: "designers/max-bill.html", type: "designer", dates: "1908–1994", tags: ["era:Mid-Century Modern","style:Swiss Style","style:Bauhaus","type:Industrial Design","type:Graphic Design","type:Clocks","collab:HfG Ulm","collab:Junghans"] },
+  { name: "Hochschule für Gestaltung Ulm (HfG Ulm)", page: "designers/hochschule-für-gestaltung-ulm-hfg-ulm.html", type: "studio", dates: "1953–1968", tags: ["era:Mid-Century Modern","style:German Modernism","type:Design School"] },
+  { name: "Hans Gugelot", page: "designers/hans-gugelot.html", type: "designer", dates: "1920–1965", tags: ["era:Mid-Century Modern","style:German Modernism","type:Industrial Design","type:Consumer Electronics","collab:Braun","collab:HfG Ulm"] },
+  { name: "Kartell", page: "companies/kartell.html", type: "company", dates: "est. 1949", tags: ["era:Mid-Century Modern","era:Postmodern / Memphis","style:Italian Design","type:Furniture","type:Homegoods","type:Plastics"] },
+  { name: "Joe Colombo", page: "designers/joe-colombo.html", type: "designer", dates: "1930–1971", tags: ["era:Postmodern / Memphis","style:Italian Design","type:Furniture","type:Lighting","type:Industrial Design","collab:Kartell","collab:Alessi"] },
+  { name: "Verner Panton", page: "designers/verner-panton.html", type: "designer", dates: "1926–1998", tags: ["era:Postmodern / Memphis","style:Pop Art","style:Scandinavian Modern","type:Furniture","type:Chairs","type:Lighting","type:Plastics","collab:Herman Miller","collab:Vitra"] },
+  { name: "Richard Sapper", page: "designers/richard-sapper.html", type: "designer", dates: "1932–2015", tags: ["era:Postmodern / Memphis","style:Italian Design","type:Consumer Electronics","type:Appliances","type:Furniture","collab:IBM","collab:Alessi","collab:Artemide"] },
+  { name: "Achille Castiglioni", page: "designers/achille-castiglioni.html", type: "designer", dates: "1918–2002", tags: ["era:Postmodern / Memphis","style:Italian Design","type:Lighting","type:Furniture","type:Industrial Design","collab:Flos","collab:Zanotta","collab:Alessi"] },
+  { name: "Mario Bellini", page: "designers/mario-bellini.html", type: "designer", dates: "b. 1935", tags: ["era:Postmodern / Memphis","style:Italian Design","type:Consumer Electronics","type:Furniture","collab:Olivetti","collab:Cassina","collab:B&B Italia"] },
+  { name: "Helmut Bätzner", page: "designers/helmut-bätzner.html", type: "designer", dates: "1928–2010", tags: ["era:Postmodern / Memphis","style:German Modernism","type:Furniture","type:Chairs","type:Plastics","collab:Bofinger"] },
+  { name: "Vico Magistretti", page: "designers/vico-magistretti.html", type: "designer", dates: "1920–2006", tags: ["era:Postmodern / Memphis","style:Italian Design","type:Furniture","type:Lighting","type:Plastics","collab:Kartell","collab:Cassina","collab:Artemide"] },
+  { name: "Robin Day", page: "designers/robin-day.html", type: "designer", dates: "1915–2010", tags: ["era:Mid-Century Modern","era:Postmodern / Memphis","style:British Modernism","type:Furniture","type:Chairs","type:Plastics","collab:Hille"] },
+  { name: "Philippe Starck", page: "designers/philippe-starck.html", type: "designer", dates: "b. 1949", tags: ["era:Postmodern / Memphis","style:Memphis Group","type:Furniture","type:Industrial Design","type:Homegoods","collab:Alessi","collab:Kartell","collab:Vitra"] },
+  { name: "Jean-Paul Caillette", page: "designers/jean-paul-caillette.html", type: "designer", dates: "1922–2004", tags: ["era:Postmodern / Memphis","style:French Modernism","type:Furniture"] },
+  { name: "Memphis Group", page: "designers/memphis-group.html", type: "studio", dates: "est. 1981", tags: ["era:Postmodern / Memphis","style:Memphis Group","type:Furniture","type:Ceramics","type:Textiles","type:Homegoods"] },
+  { name: "Alessi", page: "companies/alessi.html", type: "company", dates: "est. 1921", tags: ["era:Postmodern / Memphis","style:Celebrity Design","type:Homegoods","type:Kitchenware"] },
+  { name: "Sam Faber / OXO", page: "designers/sam-faber-oxo.html", type: "designer", dates: "fl. 1990s", tags: ["era:Postmodern / Memphis","style:Universal Design","type:Homegoods","type:Kitchenware","type:Ergonomics","collab:OXO","collab:Smart Design"] },
+  { name: "OXO", page: "companies/oxo.html", type: "company", dates: "est. 1990", tags: ["era:Postmodern / Memphis","style:Universal Design","type:Homegoods","type:Kitchenware","type:Tools"] },
+  { name: "Marc Newson", page: "designers/marc-newson.html", type: "designer", dates: "b. 1963", tags: ["era:Postmodern / Memphis","style:Organic Design","type:Furniture","type:Automotive","type:Industrial Design","collab:Cappellini","collab:Ford","collab:Qantas"] },
+  { name: "Faber Brothers / Farberware", page: "companies/faber-brothers-farberware.html", type: "company", dates: "est. 1900", tags: ["era:Mid-Century Modern","type:Homegoods","type:Kitchenware"] },
+  { name: "Louis Lepoix", page: "designers/louis-lepoix.html", type: "designer", dates: "1910–1987", tags: ["era:Postmodern / Memphis","style:German Modernism","type:Industrial Design","type:Homegoods","collab:Braun"] },
+  { name: "Luigi Colani", page: "designers/luigi-colani.html", type: "designer", dates: "1928–2019", tags: ["era:Postmodern / Memphis","style:Organic Design","type:Automotive","type:Industrial Design","type:Consumer Electronics","collab:Canon","collab:Rosenthal"] },
+  { name: "Martín Cooper", page: "designers/martín-cooper.html", type: "designer", dates: "b. 1928", tags: ["era:Postmodern / Memphis","type:Communication Devices","type:Invention","collab:Motorola"] },
+  { name: "IDEO", page: "designers/ideo.html", type: "studio", dates: "est. 1991", tags: ["era:Postmodern / Memphis","style:Human-Centered Design","type:Industrial Design","type:Product Design"] },
+  { name: "Smart Design", page: "designers/smart-design.html", type: "studio", dates: "est. 1978", tags: ["era:Postmodern / Memphis","style:Universal Design","type:Industrial Design","type:Homegoods","collab:OXO"] },
+  { name: "Naoto Fukasawa", page: "designers/naoto-fukasawa.html", type: "designer", dates: "b. 1956", tags: ["era:Postmodern / Memphis","style:Minimalism","type:Industrial Design","type:Homegoods","type:Consumer Electronics","collab:Muji","collab:±0","collab:B&B Italia"] },
+  { name: "Konstantin Grcic", page: "designers/konstantin-grcic.html", type: "designer", dates: "b. 1965", tags: ["era:Postmodern / Memphis","style:Minimalism","type:Furniture","type:Industrial Design","collab:Magis","collab:Plank"] },
+  { name: "Paul Montgomery", page: "designers/paul-montgomery.html", type: "designer", dates: "fl. 1980s–1990s", tags: ["era:Postmodern / Memphis","style:Product Semantics","type:Industrial Design"] },
+  { name: "LEGO", page: "companies/lego.html", type: "company", dates: "est. 1932", tags: ["era:Mid-Century Modern","type:Toys","type:Plastics"] },
+];
+
+let currentType = "all";
+let currentEra = "all";
+
+// Restore filter state from sessionStorage
+function restoreState() {
+  const saved = sessionStorage.getItem("idFilterState");
+  if (!saved) return;
+  const state = JSON.parse(saved);
+  currentType = state.type || "all";
+  currentEra = state.era || "all";
+  const q = state.q || "";
+  document.getElementById("search").value = q;
+  document.querySelectorAll("#type-filters .filter-btn").forEach(b => {
+    if (b.textContent.trim() === currentType || (currentType === "all" && b.textContent.trim() === "All")) b.classList.add("active");
+    else b.classList.remove("active");
+  });
+  // Re-activate era button by matching onclick attribute value
+  document.querySelectorAll("#era-filters .filter-btn").forEach(b => {
+    const match = b.getAttribute("onclick").includes(`'${currentEra}'`);
+    b.classList.toggle("active", match);
+  });
+}
+
+function saveState() {
+  sessionStorage.setItem("idFilterState", JSON.stringify({
+    type: currentType,
+    era: currentEra,
+    q: document.getElementById("search").value
+  }));
+}
+
+function renderCards(items) {
+  const grid = document.getElementById("grid");
+  const count = document.getElementById("count");
+  grid.innerHTML = "";
+  count.textContent = `Showing ${items.length} of ${data.length} entries`;
+  items.forEach(d => {
+    const eraTags = d.tags.filter(t => t.startsWith("era:")).map(t => t.replace("era:",""));
+    const styleTags = d.tags.filter(t => t.startsWith("style:")).map(t => t.replace("style:",""));
+    const typeTags = d.tags.filter(t => t.startsWith("type:")).map(t => t.replace("type:",""));
+    const collabTags = d.tags.filter(t => t.startsWith("collab:")).map(t => t.replace("collab:",""));
+    const typeLabel = d.type === "designer" ? "Designer" : d.type === "company" ? "Company" : "Studio / Organization";
+    const inner = `
+      <div class="card-type ${d.type}">${typeLabel}</div>
+      <div class="card-name">${d.name}</div>
+      ${d.dates ? `<div class="card-dates">${d.dates}</div>` : ""}
+      <div class="tags">
+        ${eraTags.map(t => `<span class="tag era">${t}</span>`).join("")}
+        ${styleTags.map(t => `<span class="tag style">${t}</span>`).join("")}
+        ${typeTags.map(t => `<span class="tag type">${t}</span>`).join("")}
+        ${collabTags.map(t => `<span class="tag collab">↔ ${t}</span>`).join("")}
+      </div>
+      ${d.page ? "" : `<div class="card-unbuilt">Page not yet built</div>`}
+    `;
+    let card;
+    if (d.page) {
+      card = document.createElement("a");
+      card.className = "card has-page";
+      card.href = d.page;
+      card.addEventListener("click", saveState);
+    } else {
+      card = document.createElement("div");
+      card.className = "card";
+    }
+    card.innerHTML = inner;
+    grid.appendChild(card);
+  });
+}
+
+function filterCards() {
+  const q = document.getElementById("search").value.toLowerCase();
+  const filtered = data.filter(d => {
+    const matchType = currentType === "all" || d.type === currentType;
+    const matchEra = currentEra === "all" || d.tags.some(t => t === "era:" + currentEra);
+    const matchSearch = !q ||
+      d.name.toLowerCase().includes(q) ||
+      (d.dates && d.dates.toLowerCase().includes(q)) ||
+      d.tags.some(t => t.toLowerCase().includes(q));
+    return matchType && matchEra && matchSearch;
+  });
+  renderCards(filtered);
+}
+
+function onSearch() { filterCards(); }
+
+function setTypeFilter(val, btn) {
+  currentType = val;
+  document.querySelectorAll("#type-filters .filter-btn").forEach(b => b.classList.remove("active"));
+  btn.classList.add("active");
+  filterCards();
+}
+
+function setEraFilter(val, btn) {
+  currentEra = val;
+  document.querySelectorAll("#era-filters .filter-btn").forEach(b => b.classList.remove("active"));
+  btn.classList.add("active");
+  filterCards();
+}
+
+function setTagFilter(btn) {
+  let currentType = "all";
+  let currentEra = "all";
+  document.querySelectorAll("#type-filters .filter-btn").forEach(b => b.classList.remove("active"));
+  btn.classList.add("active");
+  const q = 'favorite';
+  const filtered = data.filter(d => {
+    const matchType = currentType === "all" || d.type === currentType;
+    const matchEra = currentEra === "all" || d.tags.some(t => t === "era:" + currentEra);
+    const matchSearch = !q ||
+      d.name.toLowerCase().includes(q) ||
+      (d.dates && d.dates.toLowerCase().includes(q)) ||
+      d.tags.some(t => t.toLowerCase().includes(q));
+    return matchType && matchEra && matchSearch;
+  });
+  renderCards(filtered);
+}
+
+restoreState();
+filterCards();
+</script>
+</body>
+</html>

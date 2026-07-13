@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Alvar Aalto — ID History</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root { --bg:#121212; --surface:#1e1e1e; --border:#2a2a2a; --text:#f5f2ee; --muted:#888; --faint:#444; --gold:#c8a96e; --gold-dim:rgba(200,169,110,0.15); --tag-era:rgba(74,95,168,0.25); --tag-style:rgba(138,64,32,0.25); --tag-type:rgba(42,106,42,0.25); --tag-collab:rgba(106,32,128,0.25); }
+  html { scroll-behavior: smooth; }
+  body { background:var(--bg); color:var(--text); font-family:system-ui,-apple-system,sans-serif; font-size:15px; line-height:1.6; min-height:100vh; }
+  a { color:var(--gold); text-decoration:none; } a:hover { text-decoration:underline; }
+  nav { background:#000; padding:0.85rem 2.5rem; display:flex; align-items:center; gap:1.5rem; border-bottom:1px solid var(--border); position:sticky; top:0; z-index:100; }
+  .nav-back { font-size:0.8rem; color:var(--muted); letter-spacing:0.04em; transition:color 0.15s; } .nav-back:hover { color:var(--text); text-decoration:none; } .nav-back::before { content:"← "; }
+  .nav-title { font-size:0.75rem; color:var(--faint); letter-spacing:0.08em; text-transform:uppercase; }
+  .nav-type-pill { margin-left:auto; font-size:0.68rem; font-weight:600; letter-spacing:0.1em; text-transform:uppercase; padding:0.2rem 0.65rem; border-radius:20px; border:1px solid; }
+  .nav-type-pill.designer { color:var(--gold); border-color:var(--gold-dim); background:var(--gold-dim); }
+  .nav-type-pill.company { color:#c080e0; border-color:rgba(106,32,128,0.4); background:rgba(106,32,128,0.15); }
+  .nav-type-pill.studio { color:#72b872; border-color:rgba(42,106,42,0.4); background:rgba(42,106,42,0.15); }
+  .hero { padding:4rem 2.5rem 2.5rem; border-bottom:1px solid var(--border); }
+  .hero-eyebrow { font-size:0.72rem; font-weight:600; letter-spacing:0.14em; text-transform:uppercase; color:var(--gold); margin-bottom:0.75rem; }
+  .hero-name { font-size:clamp(2.8rem,7vw,5.5rem); font-weight:700; line-height:0.95; letter-spacing:-0.03em; color:var(--text); margin-bottom:1.5rem; }
+  .timeline-bar { display:flex; align-items:center; gap:1rem; margin-bottom:2rem; }
+  .tl-label { font-size:0.7rem; color:var(--muted); white-space:nowrap; }
+  .tl-track { flex:1; height:3px; background:var(--border); border-radius:2px; position:relative; max-width:480px; }
+  .tl-active { position:absolute; top:0; height:100%; background:var(--gold); border-radius:2px; }
+  .tl-dates { font-size:0.72rem; color:var(--muted); font-style:italic; white-space:nowrap; }
+  .tags { display:flex; flex-wrap:wrap; gap:0.4rem; }
+  .tag { font-size:0.68rem; padding:0.2rem 0.55rem; border-radius:12px; border:1px solid; white-space:nowrap; letter-spacing:0.02em; }
+  .tag.era { background:var(--tag-era); border-color:rgba(74,95,168,0.4); color:#8a9fd8; }
+  .tag.style { background:var(--tag-style); border-color:rgba(138,64,32,0.4); color:#d4895a; }
+  .tag.type { background:var(--tag-type); border-color:rgba(42,106,42,0.4); color:#72b872; }
+  .tag.collab { background:var(--tag-collab); border-color:rgba(106,32,128,0.4); color:#c080e0; }
+  .content { display:grid; grid-template-columns:1fr 300px; gap:0; max-width:1200px; }
+  .main-col { padding:2.5rem; border-right:1px solid var(--border); }
+  .side-col { padding:2rem 1.75rem; }
+  .section { margin-bottom:3rem; }
+  .section-label { font-size:0.68rem; font-weight:600; letter-spacing:0.14em; text-transform:uppercase; color:var(--gold); margin-bottom:1rem; display:flex; align-items:center; gap:0.75rem; }
+  .section-label::after { content:""; flex:1; height:1px; background:var(--border); }
+  .blurb { font-size:0.95rem; color:#ccc; line-height:1.75; max-width:65ch; }
+  .blurb p+p { margin-top:0.85rem; }
+  .blurb ul { padding-left:1.25rem; margin-top:0.5rem; }
+  .blurb ul li { margin-bottom:0.35rem; color:#bbb; }
+  .key-works { display:flex; flex-wrap:wrap; gap:0.5rem; }
+  .work-chip { background:var(--surface); border:1px solid var(--border); border-radius:6px; padding:0.4rem 0.75rem; font-size:0.78rem; color:var(--text); line-height:1.3; }
+  .work-chip span { display:block; font-size:0.65rem; color:var(--muted); margin-top:0.1rem; }
+  .designers-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(160px,1fr)); gap:0.6rem; }
+  .designer-chip { background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:0.6rem 0.75rem; font-size:0.78rem; color:var(--text); transition:border-color 0.15s; display:block; text-decoration:none; }
+  .designer-chip:hover { border-color:var(--gold); text-decoration:none; }
+  .designer-chip span { display:block; font-size:0.65rem; color:var(--muted); margin-top:0.15rem; }
+  .product-list { list-style:none; }
+  .product-list li { display:flex; gap:1rem; padding:0.6rem 0; border-bottom:1px solid var(--border); font-size:0.82rem; align-items:baseline; }
+  .product-list li:last-child { border-bottom:none; }
+  .product-year { color:var(--gold); font-size:0.72rem; white-space:nowrap; min-width:40px; }
+  .product-name { color:var(--text); }
+  .product-designer { color:var(--muted); font-size:0.72rem; margin-left:auto; white-space:nowrap; }
+  .gallery-controls { display:flex; align-items:center; gap:0.75rem; margin-bottom:1.25rem; flex-wrap:wrap; }
+  .url-input-row { display:flex; gap:0.5rem; flex:1; min-width:260px; }
+  .url-input-row input { flex:1; background:var(--surface); border:1px solid var(--border); border-radius:6px; color:var(--text); font-size:0.82rem; padding:0.45rem 0.75rem; outline:none; transition:border-color 0.15s; }
+  .url-input-row input:focus { border-color:var(--gold); }
+  .url-input-row input::placeholder { color:var(--faint); }
+  .btn { background:var(--gold-dim); border:1px solid var(--gold); color:var(--gold); border-radius:6px; padding:0.45rem 0.9rem; font-size:0.78rem; cursor:pointer; white-space:nowrap; transition:background 0.15s; }
+  .btn:hover { background:rgba(200,169,110,0.25); }
+  .drop-zone { border:1.5px dashed var(--faint); border-radius:8px; padding:1.25rem; text-align:center; font-size:0.78rem; color:var(--muted); cursor:pointer; transition:border-color 0.15s,background 0.15s; margin-bottom:1.25rem; }
+  .drop-zone.drag-over { border-color:var(--gold); background:var(--gold-dim); color:var(--gold); }
+  .drop-zone input[type="file"] { display:none; }
+  .gallery-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(200px,1fr)); gap:0.75rem; }
+  .gallery-item { position:relative; border-radius:8px; overflow:hidden; background:var(--surface); border:1px solid var(--border); }
+  .gallery-item img { width:100%; aspect-ratio:4/3; object-fit:cover; display:block; transition:opacity 0.2s; }
+  .gallery-item:hover img { opacity:0.85; }
+  .gallery-item-caption { padding:0.45rem 0.6rem; font-size:0.68rem; color:var(--muted); line-height:1.4; }
+  .gallery-item-remove { position:absolute; top:0.4rem; right:0.4rem; background:rgba(0,0,0,0.6); color:#fff; border:none; border-radius:50%; width:22px; height:22px; font-size:0.7rem; cursor:pointer; display:none; align-items:center; justify-content:center; }
+  .gallery-item:hover .gallery-item-remove { display:flex; }
+  .gallery-empty { grid-column:1/-1; text-align:center; padding:2.5rem; color:var(--faint); font-size:0.82rem; border:1.5px dashed var(--border); border-radius:8px; }
+  .notes-area { width:100%; min-height:180px; background:var(--surface); border:1px solid var(--border); border-radius:8px; color:var(--text); font-size:0.88rem; font-family:inherit; line-height:1.7; padding:1rem 1.1rem; resize:vertical; outline:none; transition:border-color 0.15s; }
+  .notes-area:focus { border-color:var(--gold); }
+  .notes-area::placeholder { color:var(--faint); }
+  .notes-save-row { display:flex; align-items:center; gap:0.75rem; margin-top:0.6rem; }
+  .notes-saved { font-size:0.72rem; color:var(--muted); opacity:0; transition:opacity 0.3s; }
+  .notes-saved.show { opacity:1; }
+  .side-section { margin-bottom:2rem; }
+  .side-label { font-size:0.65rem; font-weight:600; letter-spacing:0.14em; text-transform:uppercase; color:var(--muted); margin-bottom:0.75rem; padding-bottom:0.5rem; border-bottom:1px solid var(--border); }
+  .fact-list { list-style:none; }
+  .fact-list li { display:flex; justify-content:space-between; align-items:baseline; gap:0.75rem; padding:0.45rem 0; border-bottom:1px solid var(--border); font-size:0.8rem; }
+  .fact-list li:last-child { border-bottom:none; }
+  .fact-key { color:var(--muted); flex-shrink:0; }
+  .fact-val { color:var(--text); text-align:right; }
+  .ref-list { list-style:none; }
+  .ref-list li { padding:0.5rem 0; border-bottom:1px solid var(--border); font-size:0.78rem; line-height:1.4; }
+  .ref-list li:last-child { border-bottom:none; }
+  .ref-list a { color:var(--gold); }
+  .ref-type { display:inline-block; font-size:0.6rem; font-weight:600; letter-spacing:0.08em; text-transform:uppercase; color:var(--muted); background:var(--border); padding:0.1rem 0.4rem; border-radius:3px; margin-right:0.3rem; vertical-align:middle; }
+  .related-list { list-style:none; }
+  .related-list li { padding:0.3rem 0; }
+  .related-list a { font-size:0.8rem; color:var(--muted); display:flex; align-items:center; gap:0.4rem; transition:color 0.15s; }
+  .related-list a:hover { color:var(--gold); text-decoration:none; }
+  .related-list a::before { content:"→"; font-size:0.7rem; }
+  footer { border-top:1px solid var(--border); padding:1.5rem 2.5rem; font-size:0.72rem; color:var(--faint); display:flex; gap:1rem; justify-content:space-between; }
+  @media (max-width:768px) { .content { grid-template-columns:1fr; } .main-col { border-right:none; border-bottom:1px solid var(--border); padding:1.5rem 1rem; } .side-col { padding:1.5rem 1rem; } .hero { padding:2.5rem 1rem 1.75rem; } nav { padding:0.85rem 1rem; } footer { padding:1rem; flex-direction:column; } }
+</style>
+</head>
+<body>
+<nav>
+  <a class="nav-back" href="../index.html">Index</a>
+  <span class="nav-title">ID History Reference</span>
+  <span class="nav-type-pill designer">Designer</span>
+</nav>
+<div class="hero">
+  <div class="hero-eyebrow">Architecture · Furniture · Scandinavian Modern · 1898–1976</div>
+  <h1 class="hero-name">Alvar Aalto</h1>
+  <div class="timeline-bar">
+    <span class="tl-label">1600</span>
+    <div class="tl-track"><div class="tl-active" style="left:69.3%;width:18.1%;"></div></div>
+    <span class="tl-label">2030</span>
+    <span class="tl-dates">1898–1976</span>
+  </div>
+  <div class="tags"><span class="tag era">Bauhaus</span>
+    <span class="tag era">Mid-Century Modern</span>
+    <span class="tag style">Scandinavian Modern</span>
+    <span class="tag type">Furniture</span>
+    <span class="tag type">Architecture</span>
+    <span class="tag type">Glass</span>
+    <span class="tag collab">↔ Artek</span>
+    <span class="tag collab">↔ Isokon</span></div>
+</div>
+<div class="content">
+  <div class="main-col">
+    <div class="section">
+      <div class="section-label">About</div>
+      <div class="blurb"><p>Alvar Aalto was Finland's most celebrated architect and designer, a central figure in Scandinavian Modernism whose work synthesized the rationalism of the International Style with a deep attentiveness to natural materials, human sensory experience, and regional identity. Where the Bauhaus stripped design to its structural bones, Aalto insisted that warmth, texture, and organic form were not ornamental extras but functional necessities for human wellbeing.</p>
+    <p>Born in Kuortane, Finland, Aalto studied architecture in Helsinki and opened his own practice in 1923. His Paimio Sanatorium (1929–1933), designed to speed the recovery of tuberculosis patients, showed his approach fully formed: natural light flooding patient rooms, acoustic ceilings, radiators positioned to warm feet rather than heads, and his famous Paimio Chair — a cantilevered plywood form designed so that the sitting position would ease breathing.</p>
+    <p>Aalto's experiments with bent plywood, conducted with Aino Marsio-Aalto at their workshop in the early 1930s, produced some of the most important furniture of the twentieth century. By heating and pressing laminated birch, he achieved fluid, organic curves that were structurally strong and warmly tactile — a humanist alternative to the cold steel tubular furniture coming from the Bauhaus. The Stool 60 (1933), with its L-shaped leg, the Armchair 41 (Paimio Chair), and the cantilever Armchair 31 (Tank Chair) are among the most reproduced furniture pieces of the century. Artek, co-founded with Aino in 1935, continues to manufacture them.</p>
+    <p>Aalto also produced landmark glass design — the Savoy Vase (1936), with its irregular, undulating form inspired by the contours of Finnish lakes, remains one of the most recognizable design objects of the century. His architecture, from the Viipuri Library (1935) to MIT's Baker House dormitory (1949) and Finlandia Hall (1971), consistently explored the relationship between light, material, and human movement.</p></div>
+    </div>
+    <div class="section">
+      <div class="section-label">Key Works</div>
+      <div class="key-works"><div class="work-chip">Paimio Sanatorium<span>Paimio, Finland · 1929–1933</span></div><div class="work-chip">Stool 60<span>Artek · 1933</span></div><div class="work-chip">Armchair 41 (Paimio Chair)<span>Artek · 1932</span></div><div class="work-chip">Armchair 31 (Tank Chair)<span>Artek · 1932</span></div><div class="work-chip">Savoy Vase<span>Karhula-Iittala · 1936</span></div><div class="work-chip">Viipuri Library<span>Viipuri · 1935</span></div><div class="work-chip">Finnish Pavilion, World's Fair<span>New York · 1939</span></div><div class="work-chip">Baker House dormitory, MIT<span>Cambridge, MA · 1949</span></div></div>
+    </div>
+    <div class="section">
+      <div class="section-label">Gallery</div>
+      <div class="gallery-controls">
+        <div class="url-input-row">
+          <input type="text" id="url-input" placeholder="Paste an image URL and press Add…">
+          <button class="btn" onclick="addFromUrl()">Add</button>
+        </div>
+      </div>
+      <div class="drop-zone" id="drop-zone">
+        <input type="file" id="file-input" accept="image/*" multiple>
+        ↓ Drop images here or click to browse
+      </div>
+      <div class="gallery-grid" id="gallery-grid">
+        <div class="gallery-empty" id="gallery-empty">No images yet. Add files to <code>images/alvar-aalto/</code> and list them in <code>alvar-aalto.json</code>.</div>
+      </div>
+    </div>
+    <div class="section">
+      <div class="section-label">My Notes</div>
+      <textarea class="notes-area" id="notes-area" placeholder="Your study notes…"></textarea>
+      <div class="notes-save-row">
+        <button class="btn" onclick="saveNotes('alvar-aalto')">Save notes</button>
+        <span class="notes-saved" id="notes-saved">Saved ✓</span>
+      </div>
+    </div>
+  </div>
+  <div class="side-col">
+    <div class="side-section">
+      <div class="side-label">Fast Facts</div>
+      <ul class="fact-list"><li><span class="fact-key">Born</span><span class="fact-val">3 Feb 1898, Kuortane, Finland</span></li><li><span class="fact-key">Died</span><span class="fact-val">11 May 1976, Helsinki, Finland</span></li><li><span class="fact-key">Nationality</span><span class="fact-val">Finnish</span></li><li><span class="fact-key">Training</span><span class="fact-val">Architecture, Helsinki University of Technology, 1921</span></li><li><span class="fact-key">Married</span><span class="fact-val">Aino Marsio (1924), Elissa Mäkiniemi (1952)</span></li><li><span class="fact-key">Co-founded</span><span class="fact-val">Artek, 1935</span></li><li><span class="fact-key">Key material</span><span class="fact-val">Bent birch plywood</span></li><li><span class="fact-key">Week covered</span><span class="fact-val">Week 9 — Plywood</span></li></ul>
+    </div>
+    <div class="side-section">
+      <div class="side-label">References</div>
+      <ul class="ref-list"><li><span class="ref-type">Web</span><a href="https://www.alvaraalto.fi" target="_blank" rel="noopener">Alvar Aalto Foundation — Official site</a></li><li><span class="ref-type">Web</span><a href="https://www.artek.fi/stories/alvar-aalto" target="_blank" rel="noopener">Artek — Alvar Aalto</a></li><li><span class="ref-type">Web</span><a href="https://en.wikipedia.org/wiki/Alvar_Aalto" target="_blank" rel="noopener">Wikipedia — Alvar Aalto</a></li><li><span class="ref-type">Book</span><a href="https://www.phaidon.com/store/architecture/alvar-aalto-complete-works-9780714838700/" target="_blank" rel="noopener">Alvar Aalto: The Complete Works — Göran Schildt</a></li><li><span class="ref-type">Web</span><a href="https://www.moma.org/artists/1" target="_blank" rel="noopener">MoMA — Alvar Aalto</a></li></ul>
+    </div>
+    <div class="side-section">
+      <div class="side-label">Related Entries</div>
+      <ul class="related-list"><li><a href="aino-marsio-aalto.html">Aino Marsio-Aalto</a></li><li><a href="../companies/artek.html">Artek</a></li><li><a href="arne-jacobsen.html">Arne Jacobsen</a></li><li><a href="charles-and-ray-eames.html">Charles and Ray Eames</a></li><li><a href="gerald-summers.html">Gerald Summers</a></li></ul>
+    </div>
+  </div>
+</div>
+<footer>
+  <span>ID History Reference · Matthew Bird</span>
+  <a href="../index.html">← Back to index</a>
+</footer>
+<script>
+
+async function loadGallery(k,f){try{const r=await fetch(`../${f}/${k}.json`);if(!r.ok)return;const j=await r.json();if(j.images&&j.images.length>0)j.images.forEach(i=>addImageToGrid(i.file,i.caption||""));}catch(e){}}
+function addImageToGrid(src,caption){const e=document.getElementById("gallery-empty");if(e)e.remove();const g=document.getElementById("gallery-grid");const i=document.createElement("div");i.className="gallery-item";i.innerHTML=`<a href="${src}" target="_blank"><img src="${src}" alt="${caption}" loading="lazy" onerror="this.closest('.gallery-item').style.display='none'"></a><div class="gallery-item-caption">${caption}</div><button class="gallery-item-remove" onclick="this.closest('.gallery-item').remove()">✕</button>`;g.appendChild(i);}
+function addFromUrl(){const i=document.getElementById("url-input");const u=i.value.trim();if(!u)return;addImageToGrid(u,u.split("/").pop().replace(/\.[^.]+$/,"").replace(/[-_]/g," ")+" (URL)");i.value="";}
+document.getElementById("url-input").addEventListener("keydown",e=>{if(e.key==="Enter")addFromUrl();});
+const dz=document.getElementById("drop-zone");
+dz.addEventListener("dragover",e=>{e.preventDefault();dz.classList.add("drag-over");});
+dz.addEventListener("dragleave",()=>dz.classList.remove("drag-over"));
+dz.addEventListener("drop",e=>{e.preventDefault();dz.classList.remove("drag-over");handleFiles(e.dataTransfer.files);});
+dz.addEventListener("click",()=>document.getElementById("file-input").click());
+document.getElementById("file-input").addEventListener("change",function(){handleFiles(this.files);});
+function handleFiles(files){Array.from(files).forEach(f=>{if(!f.type.startsWith("image/"))return;const r=new FileReader();r.onload=e=>addImageToGrid(e.target.result,f.name.replace(/\.[^.]+$/,"")+" (local preview)");r.readAsDataURL(f);});}
+function saveNotes(k){localStorage.setItem(`notes::${k}`,document.getElementById("notes-area").value);const s=document.getElementById("notes-saved");s.classList.add("show");setTimeout(()=>s.classList.remove("show"),2000);}
+function loadNotes(k){const s=localStorage.getItem(`notes::${k}`);if(s)document.getElementById("notes-area").value=s;}
+
+loadGallery("alvar-aalto", "designers");
+loadNotes("alvar-aalto");
+</script>
+</body>
+</html>

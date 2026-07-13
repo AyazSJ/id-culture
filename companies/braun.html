@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Braun — ID History</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg:        #121212;
+    --surface:   #1e1e1e;
+    --border:    #2a2a2a;
+    --text:      #f5f2ee;
+    --muted:     #888;
+    --faint:     #444;
+    --gold:      #c8a96e;
+    --gold-dim:  rgba(200,169,110,0.15);
+    --tag-era:   rgba(74,95,168,0.25);
+    --tag-style: rgba(138,64,32,0.25);
+    --tag-type:  rgba(42,106,42,0.25);
+    --tag-collab:rgba(106,32,128,0.25);
+    --purple:    #7a4aa8;
+  }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: system-ui, -apple-system, sans-serif;
+    font-size: 15px;
+    line-height: 1.6;
+    min-height: 100vh;
+  }
+  a { color: var(--gold); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+
+  /* ── Nav ── */
+  nav {
+    background: #000;
+    padding: 0.85rem 2.5rem;
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    border-bottom: 1px solid var(--border);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .nav-back { font-size: 0.8rem; color: var(--muted); letter-spacing: 0.04em; transition: color 0.15s; }
+  .nav-back:hover { color: var(--text); text-decoration: none; }
+  .nav-back::before { content: "← "; }
+  .nav-title { font-size: 0.75rem; color: var(--faint); letter-spacing: 0.08em; text-transform: uppercase; }
+  .nav-type-pill {
+    margin-left: auto;
+    font-size: 0.68rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: #c080e0;
+    border: 1px solid rgba(106,32,128,0.4);
+    background: rgba(106,32,128,0.15);
+    padding: 0.2rem 0.65rem;
+    border-radius: 20px;
+  }
+
+  /* ── Hero ── */
+  .hero {
+    padding: 4rem 2.5rem 2.5rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .hero-eyebrow {
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 0.75rem;
+  }
+  .hero-name {
+    font-size: clamp(2.8rem, 7vw, 5.5rem);
+    font-weight: 700;
+    line-height: 0.95;
+    letter-spacing: -0.03em;
+    color: var(--text);
+    margin-bottom: 1.5rem;
+  }
+
+  /* Lifespan bar — same concept as designer timeline */
+  .timeline-bar {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 2rem;
+  }
+  .tl-label { font-size: 0.7rem; color: var(--muted); white-space: nowrap; }
+  .tl-track {
+    flex: 1;
+    height: 3px;
+    background: var(--border);
+    border-radius: 2px;
+    position: relative;
+    max-width: 480px;
+  }
+  .tl-active {
+    position: absolute;
+    top: 0;
+    height: 100%;
+    background: var(--gold);
+    border-radius: 2px;
+  }
+  .tl-dates { font-size: 0.72rem; color: var(--muted); font-style: italic; white-space: nowrap; }
+
+  /* Tags */
+  .tags { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+  .tag {
+    font-size: 0.68rem;
+    padding: 0.2rem 0.55rem;
+    border-radius: 12px;
+    border: 1px solid;
+    white-space: nowrap;
+    letter-spacing: 0.02em;
+  }
+  .tag.era    { background: var(--tag-era);   border-color: rgba(74,95,168,0.4);  color: #8a9fd8; }
+  .tag.style  { background: var(--tag-style); border-color: rgba(138,64,32,0.4);  color: #d4895a; }
+  .tag.type   { background: var(--tag-type);  border-color: rgba(42,106,42,0.4);  color: #72b872; }
+
+  /* ── Content grid ── */
+  .content {
+    display: grid;
+    grid-template-columns: 1fr 300px;
+    gap: 0;
+    max-width: 1200px;
+  }
+  .main-col { padding: 2.5rem; border-right: 1px solid var(--border); }
+  .side-col { padding: 2rem 1.75rem; }
+
+  /* ── Sections ── */
+  .section { margin-bottom: 3rem; }
+  .section-label {
+    font-size: 0.68rem;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+  .section-label::after { content: ""; flex: 1; height: 1px; background: var(--border); }
+
+  /* Blurb */
+  .blurb { font-size: 0.95rem; color: #ccc; line-height: 1.75; max-width: 65ch; }
+  .blurb p + p { margin-top: 0.85rem; }
+  .blurb ul { padding-left: 1.25rem; margin-top: 0.5rem; }
+  .blurb ul li { margin-bottom: 0.35rem; color: #bbb; }
+
+  /* Key designers — company-specific section */
+  .designers-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 0.6rem;
+  }
+  .designer-chip {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 0.6rem 0.75rem;
+    font-size: 0.78rem;
+    color: var(--text);
+    transition: border-color 0.15s;
+    display: block;
+    text-decoration: none;
+  }
+  .designer-chip:hover { border-color: var(--gold); text-decoration: none; }
+  .designer-chip span {
+    display: block;
+    font-size: 0.65rem;
+    color: var(--muted);
+    margin-top: 0.15rem;
+  }
+
+  /* Notable products — company-specific */
+  .product-list { list-style: none; }
+  .product-list li {
+    display: flex;
+    gap: 1rem;
+    padding: 0.6rem 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 0.82rem;
+    align-items: baseline;
+  }
+  .product-list li:last-child { border-bottom: none; }
+  .product-year {
+    color: var(--gold);
+    font-size: 0.72rem;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+    min-width: 40px;
+  }
+  .product-name { color: var(--text); }
+  .product-designer { color: var(--muted); font-size: 0.72rem; margin-left: auto; white-space: nowrap; }
+
+  /* Gallery */
+  .gallery-controls { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.25rem; flex-wrap: wrap; }
+  .url-input-row { display: flex; gap: 0.5rem; flex: 1; min-width: 260px; }
+  .url-input-row input {
+    flex: 1;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: var(--text);
+    font-size: 0.82rem;
+    padding: 0.45rem 0.75rem;
+    outline: none;
+    transition: border-color 0.15s;
+  }
+  .url-input-row input:focus { border-color: var(--gold); }
+  .url-input-row input::placeholder { color: var(--faint); }
+  .btn {
+    background: var(--gold-dim);
+    border: 1px solid var(--gold);
+    color: var(--gold);
+    border-radius: 6px;
+    padding: 0.45rem 0.9rem;
+    font-size: 0.78rem;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background 0.15s;
+  }
+  .btn:hover { background: rgba(200,169,110,0.25); }
+
+  .drop-zone {
+    border: 1.5px dashed var(--faint);
+    border-radius: 8px;
+    padding: 1.25rem;
+    text-align: center;
+    font-size: 0.78rem;
+    color: var(--muted);
+    cursor: pointer;
+    transition: border-color 0.15s, background 0.15s;
+    margin-bottom: 1.25rem;
+  }
+  .drop-zone.drag-over { border-color: var(--gold); background: var(--gold-dim); color: var(--gold); }
+  .drop-zone input[type="file"] { display: none; }
+
+  .gallery-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 0.75rem;
+  }
+  .gallery-item { position: relative; border-radius: 8px; overflow: hidden; background: var(--surface); border: 1px solid var(--border); }
+  .gallery-item img { width: 100%; aspect-ratio: 4/3; object-fit: cover; display: block; transition: opacity 0.2s; }
+  .gallery-item:hover img { opacity: 0.85; }
+  .gallery-item-caption { padding: 0.45rem 0.6rem; font-size: 0.68rem; color: var(--muted); line-height: 1.4; background: var(--surface); }
+  .gallery-item-remove {
+    position: absolute; top: 0.4rem; right: 0.4rem;
+    background: rgba(0,0,0,0.6); color: #fff; border: none; border-radius: 50%;
+    width: 22px; height: 22px; font-size: 0.7rem; cursor: pointer;
+    display: none; align-items: center; justify-content: center; line-height: 1;
+  }
+  .gallery-item:hover .gallery-item-remove { display: flex; }
+  .gallery-empty {
+    grid-column: 1/-1; text-align: center; padding: 2.5rem;
+    color: var(--faint); font-size: 0.82rem;
+    border: 1.5px dashed var(--border); border-radius: 8px;
+  }
+
+  /* Notes */
+  .notes-area {
+    width: 100%; min-height: 180px; background: var(--surface);
+    border: 1px solid var(--border); border-radius: 8px;
+    color: var(--text); font-size: 0.88rem; font-family: inherit;
+    line-height: 1.7; padding: 1rem 1.1rem; resize: vertical; outline: none;
+    transition: border-color 0.15s;
+  }
+  .notes-area:focus { border-color: var(--gold); }
+  .notes-area::placeholder { color: var(--faint); }
+  .notes-save-row { display: flex; align-items: center; gap: 0.75rem; margin-top: 0.6rem; }
+  .notes-saved { font-size: 0.72rem; color: var(--muted); opacity: 0; transition: opacity 0.3s; }
+  .notes-saved.show { opacity: 1; }
+
+  /* Sidebar */
+  .side-section { margin-bottom: 2rem; }
+  .side-label {
+    font-size: 0.65rem; font-weight: 600; letter-spacing: 0.14em;
+    text-transform: uppercase; color: var(--muted);
+    margin-bottom: 0.75rem; padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .fact-list { list-style: none; }
+  .fact-list li {
+    display: flex; justify-content: space-between; align-items: baseline;
+    gap: 0.75rem; padding: 0.45rem 0;
+    border-bottom: 1px solid var(--border); font-size: 0.8rem;
+  }
+  .fact-list li:last-child { border-bottom: none; }
+  .fact-key { color: var(--muted); flex-shrink: 0; }
+  .fact-val { color: var(--text); text-align: right; }
+
+  .ref-list { list-style: none; }
+  .ref-list li { padding: 0.5rem 0; border-bottom: 1px solid var(--border); font-size: 0.78rem; line-height: 1.4; }
+  .ref-list li:last-child { border-bottom: none; }
+  .ref-list a { color: var(--gold); }
+  .ref-type {
+    display: inline-block; font-size: 0.6rem; font-weight: 600;
+    letter-spacing: 0.08em; text-transform: uppercase;
+    color: var(--muted); background: var(--border);
+    padding: 0.1rem 0.4rem; border-radius: 3px;
+    margin-right: 0.3rem; vertical-align: middle;
+  }
+
+  .related-list { list-style: none; }
+  .related-list li { padding: 0.3rem 0; }
+  .related-list a {
+    font-size: 0.8rem; color: var(--muted);
+    display: flex; align-items: center; gap: 0.4rem; transition: color 0.15s;
+  }
+  .related-list a:hover { color: var(--gold); text-decoration: none; }
+  .related-list a::before { content: "→"; font-size: 0.7rem; }
+
+  footer {
+    border-top: 1px solid var(--border);
+    padding: 1.5rem 2.5rem;
+    font-size: 0.72rem; color: var(--faint);
+    display: flex; gap: 1rem; justify-content: space-between;
+  }
+
+  @media (max-width: 768px) {
+    .content { grid-template-columns: 1fr; }
+    .main-col { border-right: none; border-bottom: 1px solid var(--border); padding: 1.5rem 1rem; }
+    .side-col { padding: 1.5rem 1rem; }
+    .hero { padding: 2.5rem 1rem 1.75rem; }
+    nav { padding: 0.85rem 1rem; }
+    footer { padding: 1rem; flex-direction: column; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <a class="nav-back" href="../index.html">Index</a>
+  <span class="nav-title">ID History Reference</span>
+  <span class="nav-type-pill">Company</span>
+</nav>
+
+<div class="hero">
+  <div class="hero-eyebrow">Consumer Electronics · German Modernism · est. 1921</div>
+  <h1 class="hero-name">Braun</h1>
+
+  <!-- Braun: est. 1921, design peak ~1955–1995, within 1900–2010 window -->
+  <!-- left = (1921-1900)/110 = 19%, width = (1995-1921)/110 = 67% -->
+  <div class="timeline-bar">
+    <span class="tl-label">1900</span>
+    <div class="tl-track">
+      <div class="tl-active" style="left:19%;width:67%;"></div>
+    </div>
+    <span class="tl-label">2010</span>
+    <span class="tl-dates">Est. 1921 · Design peak 1955 – 1995</span>
+  </div>
+
+  <div class="tags">
+    <span class="tag era">Mid-Century Modern</span>
+    <span class="tag style">German Modernism</span>
+    <span class="tag style">Good Design</span>
+    <span class="tag type">Consumer Electronics</span>
+    <span class="tag type">Appliances</span>
+  </div>
+</div>
+
+<div class="content">
+
+  <div class="main-col">
+
+    <!-- About -->
+    <div class="section">
+      <div class="section-label">About</div>
+      <div class="blurb">
+        <p>Braun was founded in Frankfurt in 1921 by Max Braun as a radio and electrical components manufacturer. After Max's death in 1951, his sons Artur and Erwin took over and made the pivotal decision to transform Braun from a manufacturer into a design-driven brand — hiring a team from the Hochschule für Gestaltung Ulm (HfG Ulm) and appointing Dieter Rams as head of design in 1961.</p>
+        <p>Through the late 1950s and 1960s, Braun became the defining example of the Deutscher Werkbund ideal applied to mass-produced consumer goods: functional, honest, geometric, and meticulously detailed. The visual coherence across product lines — radios, shavers, kitchen appliances, hi-fi equipment — was unprecedented for a consumer brand at the time.</p>
+        <p>Braun's design philosophy was codified through:</p>
+        <ul>
+          <li>Close collaboration with HfG Ulm designers (Gugelot, Aicher, Bill)</li>
+          <li>Dieter Rams's Ten Principles of Good Design</li>
+          <li>A strict house palette: white, grey, black, and occasional primary accents</li>
+          <li>Standardized grid systems and typographic consistency across all products</li>
+        </ul>
+        <p>Braun was acquired by Gillette in 1967 and later by Procter & Gamble in 2005. The design-led era under Rams is considered its creative peak and remains one of the most influential corporate design programs in history.</p>
+      </div>
+    </div>
+
+    <!-- Key Designers -->
+    <div class="section">
+      <div class="section-label">Key Designers</div>
+      <div class="designers-grid">
+        <a class="designer-chip" href="../designers/dieter-rams.html">
+          Dieter Rams
+          <span>Chief Design Officer 1961–1995</span>
+        </a>
+        <a class="designer-chip" href="../designers/hans-gugelot.html">
+          Hans Gugelot
+          <span>SK 4, M125 system</span>
+        </a>
+        <a class="designer-chip" href="../designers/otl-aicher.html">
+          Otl Aicher
+          <span>Visual identity, HfG Ulm</span>
+        </a>
+        <a class="designer-chip" href="../designers/max-bill.html">
+          Max Bill
+          <span>HfG Ulm connection</span>
+        </a>
+        <a class="designer-chip" href="../designers/gerd-alfred-muller.html">
+          Gerd Alfred Müller
+          <span>Kitchen appliances</span>
+        </a>
+        <a class="designer-chip" href="../designers/max-braun.html">
+          Max Braun (founder)
+          <span>Est. 1921</span>
+        </a>
+        <!-- Add more designers here -->
+      </div>
+    </div>
+
+    <!-- Notable Products timeline -->
+    <div class="section">
+      <div class="section-label">Notable Products</div>
+      <ul class="product-list">
+        <li><span class="product-year">1933</span><span class="product-name">Frankfurt Super W radio</span><span class="product-designer">Max Braun</span></li>
+        <li><span class="product-year">1954</span><span class="product-name">Phono Super 524G radio-phonograph</span><span class="product-designer">Wilhelm Wagenfeld</span></li>
+        <li><span class="product-year">1956</span><span class="product-name">SK 4 Phonosuper (Snow White's Coffin)</span><span class="product-designer">Rams + Gugelot</span></li>
+        <li><span class="product-year">1957</span><span class="product-name">G 11 Table Fan</span><span class="product-designer">Gugelot</span></li>
+        <li><span class="product-year">1958</span><span class="product-name">T3 Pocket Radio</span><span class="product-designer">Dieter Rams</span></li>
+        <li><span class="product-year">1958</span><span class="product-name">EF 1 Flash Unit</span><span class="product-designer">Dieter Rams</span></li>
+        <li><span class="product-year">1959</span><span class="product-name">PA 2 Slide Projector</span><span class="product-designer">Dieter Rams</span></li>
+        <li><span class="product-year">1967</span><span class="product-name">Cylindric T 2 Lighter</span><span class="product-designer">Dieter Rams</span></li>
+        <li><span class="product-year">1969</span><span class="product-name">L719 Speaker</span><span class="product-designer">Dieter Rams</span></li>
+        <li><span class="product-year">1987</span><span class="product-name">ET 66 Calculator</span><span class="product-designer">Rams + Lubs</span></li>
+        <!-- Add more products here in the same format -->
+      </ul>
+    </div>
+
+    <!-- Gallery -->
+    <div class="section">
+      <div class="section-label">Gallery</div>
+      <div class="gallery-controls">
+        <div class="url-input-row">
+          <input type="text" id="url-input" placeholder="Paste an image URL and press Add…">
+          <button class="btn" onclick="addFromUrl()">Add</button>
+        </div>
+      </div>
+      <div class="drop-zone" id="drop-zone" onclick="document.getElementById('file-input').click()">
+        <input type="file" id="file-input" accept="image/*" multiple onchange="handleFiles(this.files)">
+        ↓ Drop images here or click to browse — preview only (add to <code>images/braun/</code> + JSON to save)
+      </div>
+      <div class="gallery-grid" id="gallery-grid">
+        <div class="gallery-empty" id="gallery-empty">
+          No images yet. Add files to <code>images/braun/</code> and list them in <code>braun.json</code>, or paste a URL above.
+        </div>
+      </div>
+    </div>
+
+    <!-- Notes -->
+    <div class="section">
+      <div class="section-label">My Notes</div>
+      <textarea class="notes-area" id="notes-area" placeholder="Write your own study notes, observations, or lecture notes here…"></textarea>
+      <div class="notes-save-row">
+        <button class="btn" onclick="saveNotes()">Save notes</button>
+        <span class="notes-saved" id="notes-saved">Saved ✓</span>
+        <span style="font-size:0.7rem;color:var(--faint);margin-left:auto">Saved to browser localStorage</span>
+      </div>
+    </div>
+
+  </div><!-- /main-col -->
+
+  <!-- Sidebar -->
+  <div class="side-col">
+
+    <div class="side-section">
+      <div class="side-label">Fast Facts</div>
+      <ul class="fact-list">
+        <li><span class="fact-key">Founded</span><span class="fact-val">1921, Frankfurt, Germany</span></li>
+        <li><span class="fact-key">Founder</span><span class="fact-val">Max Braun</span></li>
+        <li><span class="fact-key">Design peak</span><span class="fact-val">1955 – 1995</span></li>
+        <li><span class="fact-key">Acq. by Gillette</span><span class="fact-val">1967</span></li>
+        <li><span class="fact-key">Acq. by P&G</span><span class="fact-val">2005</span></li>
+        <li><span class="fact-key">HQ</span><span class="fact-val">Kronberg, Germany</span></li>
+        <li><span class="fact-key">Design school link</span><span class="fact-val">HfG Ulm (1953–1968)</span></li>
+        <li><span class="fact-key">Week covered</span><span class="fact-val">Week 11 — Plastics Pt. 1</span></li>
+      </ul>
+    </div>
+
+    <div class="side-section">
+      <div class="side-label">References</div>
+      <ul class="ref-list">
+        <li>
+          <span class="ref-type">Book</span>
+          <a href="https://www.phaidon.com/store/design/as-little-design-as-possible-9780714849812/" target="_blank" rel="noopener">
+            <em>As Little Design as Possible</em> — Sophie Lovell
+          </a>
+        </li>
+        <li>
+          <span class="ref-type">Film</span>
+          <a href="https://www.hustwit.com/rams/" target="_blank" rel="noopener">
+            <em>Rams</em> — Gary Hustwit, 2018
+          </a>
+        </li>
+        <li>
+          <span class="ref-type">Web</span>
+          <a href="https://www.braun.com/en/world-of-braun/design.html" target="_blank" rel="noopener">
+            Braun — Design Heritage
+          </a>
+        </li>
+        <li>
+          <span class="ref-type">Web</span>
+          <a href="https://en.wikipedia.org/wiki/Braun_(company)" target="_blank" rel="noopener">
+            Wikipedia — Braun
+          </a>
+        </li>
+        <!-- Add references here -->
+      </ul>
+    </div>
+
+    <div class="side-section">
+      <div class="side-label">Related Entries</div>
+      <ul class="related-list">
+        <li><a href="../designers/dieter-rams.html">Dieter Rams</a></li>
+        <li><a href="../designers/hans-gugelot.html">Hans Gugelot</a></li>
+        <li><a href="../designers/otl-aicher.html">Otl Aicher</a></li>
+        <li><a href="../designers/max-bill.html">Max Bill</a></li>
+        <li><a href="../designers/gerd-alfred-muller.html">Gerd Alfred Müller</a></li>
+        <li><a href="hochschule-fur-gestaltung-ulm.html">HfG Ulm</a></li>
+      </ul>
+    </div>
+
+  </div><!-- /side-col -->
+</div>
+
+<footer>
+  <span>ID History Reference · Matthew Bird</span>
+  <a href="../index.html">← Back to index</a>
+</footer>
+
+<script>
+const PAGE_KEY = "braun";
+const NOTES_KEY = `notes::${PAGE_KEY}`;
+
+async function loadGallery() {
+  try {
+    const res = await fetch(`../companies/${PAGE_KEY}.json`);
+    if (!res.ok) return;
+    const json = await res.json();
+    if (json.images && json.images.length > 0) {
+      json.images.forEach(img => addImageToGrid(img.file, img.caption || ""));
+    }
+  } catch(e) {}
+}
+
+function addImageToGrid(src, caption) {
+  const empty = document.getElementById("gallery-empty");
+  if (empty) empty.remove();
+  const grid = document.getElementById("gallery-grid");
+  const item = document.createElement("div");
+  item.className = "gallery-item";
+  item.innerHTML = `
+    <a href="${src}" target="_blank" rel="noopener">
+      <img src="${src}" alt="${caption}" loading="lazy" onerror="this.closest('.gallery-item').style.display='none'">
+    </a>
+    <div class="gallery-item-caption">${caption}</div>
+    <button class="gallery-item-remove" onclick="this.closest('.gallery-item').remove()" title="Remove (preview only)">✕</button>
+  `;
+  grid.appendChild(item);
+}
+
+function addFromUrl() {
+  const input = document.getElementById("url-input");
+  const url = input.value.trim();
+  if (!url) return;
+  const caption = url.split("/").pop().replace(/\.[^.]+$/, "").replace(/[-_]/g, " ");
+  addImageToGrid(url, caption + " (URL preview)");
+  input.value = "";
+}
+document.getElementById("url-input").addEventListener("keydown", e => { if (e.key === "Enter") addFromUrl(); });
+
+const dropZone = document.getElementById("drop-zone");
+dropZone.addEventListener("dragover", e => { e.preventDefault(); dropZone.classList.add("drag-over"); });
+dropZone.addEventListener("dragleave", () => dropZone.classList.remove("drag-over"));
+dropZone.addEventListener("drop", e => {
+  e.preventDefault();
+  dropZone.classList.remove("drag-over");
+  handleFiles(e.dataTransfer.files);
+});
+function handleFiles(files) {
+  Array.from(files).forEach(file => {
+    if (!file.type.startsWith("image/")) return;
+    const reader = new FileReader();
+    reader.onload = e => addImageToGrid(e.target.result, file.name.replace(/\.[^.]+$/, "") + " (local preview)");
+    reader.readAsDataURL(file);
+  });
+}
+
+function saveNotes() {
+  localStorage.setItem(NOTES_KEY, document.getElementById("notes-area").value);
+  const indicator = document.getElementById("notes-saved");
+  indicator.classList.add("show");
+  setTimeout(() => indicator.classList.remove("show"), 2000);
+}
+function loadNotes() {
+  const saved = localStorage.getItem(NOTES_KEY);
+  if (saved) document.getElementById("notes-area").value = saved;
+}
+
+loadGallery();
+loadNotes();
+</script>
+</body>
+</html>
