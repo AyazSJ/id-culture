@@ -18,6 +18,7 @@ id-culture/
 ├── gallery_sync.py             ← Generates/updates JSON gallery files from image folders
 ├── sync_index_links.py         ← Scans generated pages and updates index.html links
 ├── create_image_folders.py     ← Creates images/ subfolder for every entry
+├── optimize_images.py          ← Resizes and compresses images before committing
 ├── nextcloud_gallery_sync.py   ← Syncs gallery JSONs from a Nextcloud share (optional)
 │
 ├── designers/
@@ -156,6 +157,26 @@ python create_image_folders.py
 
 ---
 
+### `optimize_images.py`
+Resizes and compresses all images in the `images/` folder in place. Caps width at 1200px and compresses JPEGs to quality 82. Run this before `gallery_sync.py` whenever you add new images.
+
+```bash
+# Optimize one entry
+python optimize_images.py dieter-rams
+
+# Optimize everything
+python optimize_images.py
+```
+
+Requires Pillow:
+```bash
+pip install Pillow
+```
+
+You can adjust `MAX_WIDTH` and `JPEG_QUALITY` at the top of the script.
+
+---
+
 ### `nextcloud_gallery_sync.py` (optional)
 Syncs gallery JSONs from a Nextcloud public share instead of local image folders. Only useful if hosting images on Nextcloud. Edit the three config values at the top of the script before running.
 
@@ -174,12 +195,15 @@ Note: Nextcloud serves files as downloads rather than inline images, which cause
 # 1. Drop image files into the right folder
 #    images/dieter-rams/braun-phase-1-1971.jpg
 
-# 2. Run gallery sync
+# 2. Optimize — resizes to 1200px wide and compresses in place
+python optimize_images.py dieter-rams
+
+# 3. Sync to JSON
 python gallery_sync.py dieter-rams
 
-# 3. Edit captions in the JSON if needed
+# 4. Edit captions in the JSON if needed
 
-# 4. Commit and push
+# 5. Commit and push
 git add .
 git commit -m "add Dieter Rams images"
 git push
@@ -187,11 +211,16 @@ git push
 
 Then hard refresh the live site (**Ctrl+Shift+R**) to bypass browser cache.
 
+To optimize every folder at once:
+```bash
+python optimize_images.py
+```
+
 ### Image naming
 Keep filenames **lowercase and hyphenated**: `braun-phase-1-1971.jpg` not `Braun Phase 1 1971.jpg`. GitHub Pages runs on Linux which is case-sensitive — mismatched case works locally but breaks on the live site.
 
 ### Image size
-Resize images to around 1200px wide before committing. This keeps the repo well under GitHub's 1GB soft limit even with many images per entry. Tools: Squoosh (browser), ImageOptim (Mac), or Photos export at "web" quality.
+`optimize_images.py` handles resizing automatically — it caps images at 1200px wide and compresses JPEGs to quality 82. You can adjust both values at the top of the script. This keeps the repo well under GitHub's 1GB soft limit even with many images per entry.
 
 ---
 
