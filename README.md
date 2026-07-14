@@ -328,3 +328,9 @@ Tags use a `kind:value` format in `index.html`:
 | `collab:` | Associated company or studio | `collab:Braun` |
 
 These drive the filter buttons on the index, the tag chips on each card, and the Related Entries cross-referencing on detail pages.
+
+
+missing designers:
+olof backstrom and fiskamin
+vignelli
+colombini
