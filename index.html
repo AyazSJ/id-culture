@@ -400,20 +400,9 @@ function setEraFilter(val, btn) {
 }
 
 function setTagFilter(btn) {
-  let currentType = "all";
-  let currentEra = "all";
   document.querySelectorAll("#type-filters .filter-btn").forEach(b => b.classList.remove("active"));
   btn.classList.add("active");
-  const q = 'favorite';
-  const filtered = data.filter(d => {
-    const matchType = currentType === "all" || d.type === currentType;
-    const matchEra = currentEra === "all" || d.tags.some(t => t === "era:" + currentEra);
-    const matchSearch = !q ||
-      d.name.toLowerCase().includes(q) ||
-      (d.dates && d.dates.toLowerCase().includes(q)) ||
-      d.tags.some(t => t.toLowerCase().includes(q));
-    return matchType && matchEra && matchSearch;
-  });
+  const filtered = data.filter(d => d.tags.includes("type:Favorite"));
   renderCards(filtered);
 }
 
