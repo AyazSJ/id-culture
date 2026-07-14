@@ -1,0 +1,24 @@
+{
+  "images": [
+    {
+      "file": "../images/eero-saarinen/Executive-Chair-1946.jpg",
+      "caption": "Executive Chair 1946"
+    },
+    {
+      "file": "../images/eero-saarinen/Grasshopper-Chair-1946.jpg",
+      "caption": "Grasshopper Chair 1946"
+    },
+    {
+      "file": "../images/eero-saarinen/Tulip-Chair-1956.jpg",
+      "caption": "Tulip Chair 1956"
+    },
+    {
+      "file": "../images/eero-saarinen/Tulip-Table-1957.jpg",
+      "caption": "Tulip Table 1957"
+    },
+    {
+      "file": "../images/eero-saarinen/Womb-Chair-1948.jpg",
+      "caption": "Womb Chair 1948"
+    }
+  ]
+}
